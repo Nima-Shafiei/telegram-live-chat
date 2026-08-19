@@ -1,0 +1,30 @@
+.tlc-admin-page {
+    max-width: 900px;
+}
+
+.tlc-admin-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tlc-admin-title img {
+    width: 26px;
+    height: 26px;
+}
+
+.tlc-pairing-form {
+    display: inline-block;
+}
+
+.tlc-pairing-form .submit {
+    margin: 0;
+}
+
+.tlc-telegram-button {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 6px;
+    background: #2aabee !important;
+    border-color: #229ed9 !important;
+}
