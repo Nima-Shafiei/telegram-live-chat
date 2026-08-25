@@ -1,4 +1,4 @@
-=== TLC - Telegram Live Chat ===
+=== TLC - Live chat with Telegram ===
 Contributors: nimashafiee
 Tags: telegram, live chat, customer support, chat, support
 Requires at least: 6.5
@@ -29,7 +29,7 @@ Key features:
 
 == Installation ==
 
-1. Upload the `telegram-live-chat` folder to the `/wp-content/plugins/` directory, or install the ZIP file from the WordPress Plugins screen.
+1. Upload the `tlc-live-chat-with-telegram` folder to the `/wp-content/plugins/` directory, or install the ZIP file from the WordPress Plugins screen.
 2. Activate Telegram Live Chat through the Plugins screen in WordPress.
 3. Open **TLC > Settings** and save the token supplied by BotFather.
 4. Select **Connect Telegram** to verify the bot and register its webhook.

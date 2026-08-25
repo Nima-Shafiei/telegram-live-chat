@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: TLC - Telegram Live Chat
+ * Plugin Name: TLC - Live chat with Telegram
  * Description: Connect your WordPress website chat with Telegram for real-time customer support.
  * Version: 1.0.0
  * Author: Nima Shafiee

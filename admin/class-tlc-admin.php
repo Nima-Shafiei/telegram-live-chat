@@ -436,8 +436,8 @@ public static function remove_administrator() {
 		public static function add_menu() {
 
 		add_menu_page(
-			__( 'Telegram Live Chat', 'telegram-live-chat' ),
-			__( 'Telegram Live Chat', 'telegram-live-chat' ),
+			__( 'TLC - Live chat with Telegram', 'telegram-live-chat' ),
+			__( 'TLC - Live chat with Telegram', 'telegram-live-chat' ),
 			'manage_options',
 			'telegram-live-chat',
 			array( __CLASS__, 'render_settings_page' ),
@@ -852,7 +852,7 @@ TLC_Cleanup::reschedule();
 		<p>
 			<?php
 			esc_html_e(
-				'Control how Telegram Live Chat stores and removes temporary conversation data.',
+				'Control how TLC stores and removes temporary conversation data.',
 				'telegram-live-chat'
 			);
 			?>
@@ -1712,7 +1712,7 @@ $pairing_url = sprintf(
 				<img src="<?php echo esc_url( TLC_URL . 'assets/telegram-icon.svg' ); ?>" alt="" aria-hidden="true">
 				<?php
 				esc_html_e(
-					'Telegram Live Chat',
+					'TLC - Live chat with Telegram',
 					'telegram-live-chat'
 				);
 				?>
