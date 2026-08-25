@@ -63,14 +63,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (result.message_id) {
-                lastMessageId = Math.max(lastMessageId, Number(result.message_id));
+                lastMessageId = Math.max(
+                    lastMessageId,
+                    Number(result.message_id),
+                );
             }
 
             startPolling();
         } catch (error) {
             console.error('TLC send message error:', error);
             optimisticMessage.remove();
-            addMessage(TLC_DATA.errorMessage || 'Message could not be sent. Please try again.', 'system');
+            addMessage(
+                TLC_DATA.errorMessage ||
+                    'Message could not be sent. Please try again.',
+                'system',
+            );
         }
     });
 
@@ -87,15 +94,22 @@ document.addEventListener('DOMContentLoaded', () => {
         let id = localStorage.getItem(storageKey);
 
         if (!id) {
-            if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+            if (
+                window.crypto &&
+                typeof window.crypto.randomUUID === 'function'
+            ) {
                 id = window.crypto.randomUUID();
             } else {
-                id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, character => {
-                    const random = Math.floor(Math.random() * 16);
-                    const value = character === 'x' ? random : (random & 0x3) | 0x8;
+                id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
+                    /[xy]/g,
+                    character => {
+                        const random = Math.floor(Math.random() * 16);
+                        const value =
+                            character === 'x' ? random : (random & 0x3) | 0x8;
 
-                    return value.toString(16);
-                });
+                        return value.toString(16);
+                    },
+                );
             }
 
             localStorage.setItem(storageKey, id);
@@ -166,7 +180,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 const result = await response.json();
-                conversationId = result && result.conversation_id ? Number(result.conversation_id) : null;
+                conversationId =
+                    result && result.conversation_id
+                        ? Number(result.conversation_id)
+                        : null;
             }
 
             if (!conversationId) {
@@ -213,7 +230,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function buildRestUrl(endpoint, parameters = {}) {
-        const url = new URL(`${TLC_DATA.restUrl}${endpoint}`, window.location.origin);
+        const url = new URL(
+            `${TLC_DATA.restUrl}${endpoint}`,
+            window.location.origin,
+        );
 
         Object.entries(parameters).forEach(([key, value]) => {
             url.searchParams.set(key, String(value));
@@ -223,7 +243,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function startPolling() {
-        if (!conversationId || windowElement.hidden || document.hidden || pollingTimer || isPolling) {
+        if (
+            !conversationId ||
+            windowElement.hidden ||
+            document.hidden ||
+            pollingTimer ||
+            isPolling
+        ) {
             return;
         }
 
@@ -240,7 +266,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function schedulePoll(delay) {
-        if (!conversationId || windowElement.hidden || document.hidden || pollingTimer) {
+        if (
+            !conversationId ||
+            windowElement.hidden ||
+            document.hidden ||
+            pollingTimer
+        ) {
             return;
         }
 
@@ -251,7 +282,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function pollMessages() {
-        if (isPolling || !conversationId || windowElement.hidden || document.hidden) {
+        if (
+            isPolling ||
+            !conversationId ||
+            windowElement.hidden ||
+            document.hidden
+        ) {
             return;
         }
 
@@ -285,7 +321,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             lastMessageId = id;
 
-            if (includeVisitorMessages || item.sender === 'admin' || item.sender === 'system') {
+            if (
+                includeVisitorMessages ||
+                item.sender === 'admin' ||
+                item.sender === 'system'
+            ) {
                 addMessage(item.message, item.sender);
             }
         });

@@ -55,8 +55,6 @@ class TLC_Plugin {
 	}
 
 	/**
-	 * Replace only the previous built-in Persian messages for existing sites.
-	 * Custom administrator messages are left unchanged.
 	 *
 	 * @return void
 	 */
