@@ -2,9 +2,10 @@
 /**
  * Plugin Name: TLC - Live chat with Telegram
  * Description: Connect your WordPress website chat with Telegram for real-time customer support.
- * Version: 1.0.0
+ * Version: 1.1.0
  * Author: Nima Shafiee
- * Text Domain: telegram-live-chat
+ * Author URI: https://www.linkedin.com/in/nima-shafiee/
+ * Text Domain: tlc-live-chat-with-telegram
  * Domain Path: /languages
  * Requires at least: 6.5
  * Requires PHP: 7.4
@@ -16,25 +17,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'TLC_VERSION', '1.0.0' );
-define( 'TLC_FILE', __FILE__ );
-define( 'TLC_PATH', plugin_dir_path( __FILE__ ) );
-define( 'TLC_URL', plugin_dir_url( __FILE__ ) );
+define( 'TLCWT_VERSION', '1.1.0' );
+define( 'TLCWT_FILE', __FILE__ );
+define( 'TLCWT_PATH', plugin_dir_path( __FILE__ ) );
+define( 'TLCWT_URL', plugin_dir_url( __FILE__ ) );
 
-require_once TLC_PATH . 'includes/class-tlc-activator.php';
-require_once TLC_PATH . 'includes/class-tlc-deactivator.php';
-require_once TLC_PATH . 'includes/class-tlc-plugin.php';
-require_once TLC_PATH . 'includes/class-tlc-database.php';
-require_once TLC_PATH . 'includes/class-tlc-cleanup.php';
+require_once TLCWT_PATH . 'includes/class-tlc-activator.php';
+require_once TLCWT_PATH . 'includes/class-tlc-deactivator.php';
+require_once TLCWT_PATH . 'includes/class-tlc-plugin.php';
+require_once TLCWT_PATH . 'includes/class-tlc-database.php';
+require_once TLCWT_PATH . 'includes/class-tlc-cleanup.php';
 
 register_activation_hook(
 	__FILE__,
-	array( 'TLC_Activator', 'activate' )
+	array( 'TLCWT_Activator', 'activate' )
 );
 
 register_deactivation_hook(
 	__FILE__,
-	array( 'TLC_Deactivator', 'deactivate' )
+	array( 'TLCWT_Deactivator', 'deactivate' )
 );
 
-TLC_Plugin::instance();
+TLCWT_Plugin::instance();

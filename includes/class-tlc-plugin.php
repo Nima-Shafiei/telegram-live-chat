@@ -4,7 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class TLC_Plugin {
+class TLCWT_Plugin {
 
 	private static $instance = null;
 
@@ -25,16 +25,16 @@ class TLC_Plugin {
 
 	private function load_dependencies() {
 
-	require_once TLC_PATH . 'admin/class-tlc-admin.php';
-	require_once TLC_PATH . 'public/class-tlc-public.php';
-	require_once TLC_PATH . 'rest-api/class-tlc-rest.php';
-	require_once TLC_PATH . 'telegram/class-tlc-telegram.php';
+	require_once TLCWT_PATH . 'admin/class-tlc-admin.php';
+	require_once TLCWT_PATH . 'public/class-tlc-public.php';
+	require_once TLCWT_PATH . 'rest-api/class-tlc-rest.php';
+	require_once TLCWT_PATH . 'telegram/class-tlc-telegram.php';
 }
 	private function init_hooks() {
 
 		add_action(
 			'plugins_loaded',
-			array( 'TLC_Database', 'maybe_upgrade' )
+			array( 'TLCWT_Database', 'maybe_upgrade' )
 		);
 
 		add_action(
@@ -44,13 +44,13 @@ class TLC_Plugin {
 		);
 
 		if ( is_admin() ) {
-		TLC_Admin::init();
+		TLCWT_Admin::init();
 	}
 
-	TLC_Public::init();
-	TLC_REST::init();
-		TLC_Telegram::init();
-			TLC_Cleanup::init();
+	TLCWT_Public::init();
+	TLCWT_REST::init();
+		TLCWT_Telegram::init();
+			TLCWT_Cleanup::init();
 
 	}
 
@@ -60,7 +60,7 @@ class TLC_Plugin {
 	 */
 	public static function migrate_default_messages() {
 
-		$settings = get_option( 'tlc_settings', array() );
+		$settings = get_option( 'tlcwt_settings', array() );
 
 		if ( ! is_array( $settings ) ) {
 			return;
@@ -85,7 +85,7 @@ class TLC_Plugin {
 	}
 
 		if ( $changed ) {
-			update_option( 'tlc_settings', $settings );
+			update_option( 'tlcwt_settings', $settings );
 		}
 	}
 

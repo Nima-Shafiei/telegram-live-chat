@@ -4,7 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class TLC_Admin {
+class TLCWT_Admin {
 
 	/**
 	 * Initialize admin functionality.
@@ -28,21 +28,21 @@ class TLC_Admin {
 			array( __CLASS__, 'enqueue_assets' )
 		);
 		add_action(
-	'admin_post_tlc_add_administrator',
+	'admin_post_tlcwt_add_administrator',
 	array( __CLASS__, 'add_administrator' )
 );
 
 		add_action(
-			'admin_post_tlc_connect_telegram',
+			'admin_post_tlcwt_connect_telegram',
 			array( __CLASS__, 'connect_telegram' )
 		);
 		add_action(
-	'admin_post_tlc_remove_administrator',
+	'admin_post_tlcwt_remove_administrator',
 	array( __CLASS__, 'remove_administrator' )
 );
 
 		add_action(
-			'admin_post_tlc_run_cleanup',
+			'admin_post_tlcwt_run_cleanup',
 			array( __CLASS__, 'run_cleanup_now' )
 		);
 	}
@@ -55,15 +55,28 @@ class TLC_Admin {
 	 */
 	public static function enqueue_assets( $hook_suffix ) {
 
-		if ( ! in_array( $hook_suffix, array( 'toplevel_page_telegram-live-chat', 'telegram-live-chat_page_tlc-administrators' ), true ) ) {
+		if ( ! in_array( $hook_suffix, array( 'toplevel_page_tlc-live-chat-with-telegram', 'tlc-live-chat-with-telegram_page_tlcwt-administrators' ), true ) ) {
 			return;
 		}
 
 		wp_enqueue_style(
-			'tlc-admin',
-			TLC_URL . 'admin/css/admin.css',
+			'tlcwt-admin',
+			TLCWT_URL . 'admin/css/admin.css',
 			array(),
-			TLC_VERSION
+			TLCWT_VERSION
+		);
+
+		wp_enqueue_style( 'wp-color-picker' );
+		wp_enqueue_media();
+
+		wp_enqueue_script( 'wp-color-picker' );
+
+		wp_enqueue_script(
+			'tlcwt-admin',
+			TLCWT_URL . 'admin/js/admin.js',
+			array( 'wp-color-picker', 'media-editor', 'media-views' ),
+			TLCWT_VERSION,
+			true
 		);
 	}
 	/**
@@ -78,7 +91,7 @@ public static function render_administrators_page() {
 	}
 
 	$settings = get_option(
-		'tlc_settings',
+		'tlcwt_settings',
 		array()
 	);
 
@@ -103,38 +116,43 @@ $owner_chat_id = isset( $settings['admin_chat_id'] )
 		? $settings['bot_username']
 		: '';
 
-	$pairing_url = ( ! empty( $pairing_token ) && ! empty( $bot_username ) )
+		$pairing_url = ( ! empty( $pairing_token ) && ! empty( $bot_username ) )
 		? sprintf(
 			'https://t.me/%s?start=%s',
 			$bot_username,
 			rawurlencode( $pairing_token )
 		)
 		: '';
+	$just_connected = filter_input( INPUT_GET, 'tlcwt_connected', FILTER_VALIDATE_INT );
 
 	?>
 
-	<div class="wrap tlc-admin-page">
+	<div class="wrap tlcwt-admin-page">
 
-		<h1 class="tlc-admin-title">
-			<img src="<?php echo esc_url( TLC_URL . 'assets/telegram-icon.svg' ); ?>" alt="" aria-hidden="true">
+		<h1 class="tlcwt-admin-title">
+			<img src="<?php echo esc_url( TLCWT_URL . 'assets/telegram-icon.svg' ); ?>" alt="" aria-hidden="true">
 			<?php
 			esc_html_e(
 				'Administrators',
-				'telegram-live-chat'
+				'tlc-live-chat-with-telegram'
 			);
 			?>
 		</h1>
+
+		<?php if ( $just_connected ) : ?>
+			<div class="notice notice-success is-dismissible"><p><strong><?php esc_html_e( 'Telegram connected successfully. A pairing link is ready below.', 'tlc-live-chat-with-telegram' ); ?></strong></p></div>
+		<?php endif; ?>
 
 		<p>
 			<?php
 			esc_html_e(
 				'Add another Telegram administrator to receive and reply to customer messages.',
-				'telegram-live-chat'
+				'tlc-live-chat-with-telegram'
 			);
 			?>
 		</p>
 
-		<form class="tlc-pairing-form"
+		<form class="tlcwt-pairing-form"
 			method="post"
 			action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"
 		>
@@ -142,19 +160,19 @@ $owner_chat_id = isset( $settings['admin_chat_id'] )
 			<input
 				type="hidden"
 				name="action"
-				value="tlc_add_administrator"
+				value="tlcwt_add_administrator"
 			>
 
 			<?php
 			wp_nonce_field(
-				'tlc_add_administrator'
+				'tlcwt_add_administrator'
 			);
 			?>
 
 			<?php
 				submit_button(
-				__( 'Generate Pairing Link', 'telegram-live-chat' ),
-				'primary tlc-telegram-button'
+				__( 'Generate Pairing Link', 'tlc-live-chat-with-telegram' ),
+				'primary tlcwt-telegram-button'
 			);
 			?>
 
@@ -165,11 +183,11 @@ $owner_chat_id = isset( $settings['admin_chat_id'] )
 			<hr>
 
 			<h2>
-				<?php esc_html_e( 'Administrator Pairing', 'telegram-live-chat' ); ?>
+				<?php esc_html_e( 'Administrator Pairing', 'tlc-live-chat-with-telegram' ); ?>
 			</h2>
 
 			<p>
-				<?php esc_html_e( 'Send this pairing link to the Telegram administrator you want to add. It expires in 10 minutes.', 'telegram-live-chat' ); ?>
+				<?php esc_html_e( 'Send this pairing link to the Telegram administrator you want to add. It expires in 10 minutes.', 'tlc-live-chat-with-telegram' ); ?>
 			</p>
 
 			<p>
@@ -184,7 +202,7 @@ $owner_chat_id = isset( $settings['admin_chat_id'] )
 
 			<div class="notice notice-warning inline">
 				<p>
-					<?php esc_html_e( 'Connect your Telegram bot in Settings first, then generate the pairing link.', 'telegram-live-chat' ); ?>
+					<?php esc_html_e( 'Connect your Telegram bot in Settings first, then generate the pairing link.', 'tlc-live-chat-with-telegram' ); ?>
 				</p>
 			</div>
 
@@ -192,15 +210,15 @@ $owner_chat_id = isset( $settings['admin_chat_id'] )
 		<hr>
 
 		<h2>
-			<?php esc_html_e( 'Telegram Administrators', 'telegram-live-chat' ); ?>
+			<?php esc_html_e( 'Telegram Administrators', 'tlc-live-chat-with-telegram' ); ?>
 		</h2>
 
 		<table class="widefat striped">
 			<thead>
 				<tr>
-					<th><?php esc_html_e( 'Chat ID', 'telegram-live-chat' ); ?></th>
-					<th><?php esc_html_e( 'Role', 'telegram-live-chat' ); ?></th>
-					<th><?php esc_html_e( 'Action', 'telegram-live-chat' ); ?></th>
+					<th><?php esc_html_e( 'Chat ID', 'tlc-live-chat-with-telegram' ); ?></th>
+					<th><?php esc_html_e( 'Role', 'tlc-live-chat-with-telegram' ); ?></th>
+					<th><?php esc_html_e( 'Action', 'tlc-live-chat-with-telegram' ); ?></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -208,7 +226,7 @@ $owner_chat_id = isset( $settings['admin_chat_id'] )
 				<?php if ( ! empty( $owner_chat_id ) ) : ?>
 					<tr>
 						<td><?php echo esc_html( $owner_chat_id ); ?></td>
-						<td><?php esc_html_e( 'Owner', 'telegram-live-chat' ); ?></td>
+						<td><?php esc_html_e( 'Owner', 'tlc-live-chat-with-telegram' ); ?></td>
 						<td>&mdash;</td>
 					</tr>
 				<?php endif; ?>
@@ -226,24 +244,24 @@ $owner_chat_id = isset( $settings['admin_chat_id'] )
 					$remove_url = wp_nonce_url(
 						add_query_arg(
 							array(
-								'action'  => 'tlc_remove_administrator',
+								'action'  => 'tlcwt_remove_administrator',
 								'chat_id' => $admin_chat_id,
 							),
 							admin_url( 'admin-post.php' )
 						),
-						'tlc_remove_administrator'
+						'tlcwt_remove_administrator'
 					);
 					?>
 					<tr>
 						<td><?php echo esc_html( $admin_chat_id ); ?></td>
-						<td><?php esc_html_e( 'Administrator', 'telegram-live-chat' ); ?></td>
+						<td><?php esc_html_e( 'Administrator', 'tlc-live-chat-with-telegram' ); ?></td>
 						<td>
 	
 		<a href="<?php echo esc_url( $remove_url ); ?>"
 		class="button button-secondary"
-		onclick="return confirm('<?php echo esc_js( __( 'Are you sure you want to remove this administrator?', 'telegram-live-chat' ) ); ?>');"
+		onclick="return confirm('<?php echo esc_js( __( 'Are you sure you want to remove this administrator?', 'tlc-live-chat-with-telegram' ) ); ?>');"
 	>
-		<?php esc_html_e( 'Remove', 'telegram-live-chat' ); ?>
+		<?php esc_html_e( 'Remove', 'tlc-live-chat-with-telegram' ); ?>
 	</a>
 </td>
 					</tr>
@@ -252,7 +270,7 @@ $owner_chat_id = isset( $settings['admin_chat_id'] )
 				<?php if ( empty( $owner_chat_id ) && empty( $admins ) ) : ?>
 					<tr>
 						<td colspan="3">
-							<?php esc_html_e( 'No administrators paired yet.', 'telegram-live-chat' ); ?>
+							<?php esc_html_e( 'No administrators paired yet.', 'tlc-live-chat-with-telegram' ); ?>
 						</td>
 					</tr>
 				<?php endif; ?>
@@ -276,17 +294,17 @@ public static function add_administrator() {
 		wp_die(
 			esc_html__(
 				'You do not have permission to perform this action.',
-				'telegram-live-chat'
+				'tlc-live-chat-with-telegram'
 			)
 		);
 	}
 
 	check_admin_referer(
-		'tlc_add_administrator'
+		'tlcwt_add_administrator'
 	);
 
 	$settings = get_option(
-		'tlc_settings',
+		'tlcwt_settings',
 		array()
 	);
 
@@ -316,14 +334,14 @@ public static function add_administrator() {
 	$settings['pairing_token_plain'] = $pairing_token;
 
 	update_option(
-		'tlc_settings',
+		'tlcwt_settings',
 		$settings
 	);
 
 	wp_safe_redirect(
 		add_query_arg(
 			array(
-				'page' => 'tlc-administrators',
+				'page' => 'tlcwt-administrators',
 			),
 			admin_url( 'admin.php' )
 		)
@@ -344,12 +362,12 @@ public static function remove_administrator() {
 		wp_die(
 			esc_html__(
 				'You do not have permission to perform this action.',
-				'telegram-live-chat'
+				'tlc-live-chat-with-telegram'
 			)
 		);
 	}
 
-	check_admin_referer( 'tlc_remove_administrator' );
+	check_admin_referer( 'tlcwt_remove_administrator' );
 
 	$chat_id = sanitize_text_field(
 		(string) filter_input( INPUT_GET, 'chat_id', FILTER_UNSAFE_RAW )
@@ -358,14 +376,14 @@ public static function remove_administrator() {
 	if ( empty( $chat_id ) ) {
 
 		wp_safe_redirect(
-			admin_url( 'admin.php?page=tlc-administrators' )
+			admin_url( 'admin.php?page=tlcwt-administrators' )
 		);
 
 		exit;
 	}
 
 	$settings = get_option(
-		'tlc_settings',
+		'tlcwt_settings',
 		array()
 	);
 
@@ -393,7 +411,7 @@ public static function remove_administrator() {
 		wp_die(
 			esc_html__(
 				'The Owner administrator cannot be removed.',
-				'telegram-live-chat'
+				'tlc-live-chat-with-telegram'
 			)
 		);
 	}
@@ -414,13 +432,13 @@ public static function remove_administrator() {
 	$settings['admins'] = $remaining_admins;
 
 	update_option(
-		'tlc_settings',
+		'tlcwt_settings',
 		$settings
 	);
 
 	wp_safe_redirect(
 		admin_url(
-			'admin.php?page=tlc-administrators&removed=1'
+			'admin.php?page=tlcwt-administrators&removed=1'
 		)
 	);
 
@@ -436,30 +454,30 @@ public static function remove_administrator() {
 		public static function add_menu() {
 
 		add_menu_page(
-			__( 'TLC - Live chat with Telegram', 'telegram-live-chat' ),
-			__( 'TLC - Live chat with Telegram', 'telegram-live-chat' ),
+			__( 'TLC - Live chat with Telegram', 'tlc-live-chat-with-telegram' ),
+			__( 'TLC - Live chat with Telegram', 'tlc-live-chat-with-telegram' ),
 			'manage_options',
-			'telegram-live-chat',
+			'tlc-live-chat-with-telegram',
 			array( __CLASS__, 'render_settings_page' ),
-			TLC_URL . 'assets/telegram-icon.svg',
+			TLCWT_URL . 'assets/telegram-icon.svg',
 			30
 		);
 
 		add_submenu_page(
-			'telegram-live-chat',
-			__( 'Settings', 'telegram-live-chat' ),
-			__( 'Settings', 'telegram-live-chat' ),
+			'tlc-live-chat-with-telegram',
+			__( 'Settings', 'tlc-live-chat-with-telegram' ),
+			__( 'Settings', 'tlc-live-chat-with-telegram' ),
 			'manage_options',
-			'telegram-live-chat',
+			'tlc-live-chat-with-telegram',
 			array( __CLASS__, 'render_settings_page' )
 		);
 
 		add_submenu_page(
-			'telegram-live-chat',
-			__( 'Administrators', 'telegram-live-chat' ),
-			__( 'Administrators', 'telegram-live-chat' ),
+			'tlc-live-chat-with-telegram',
+			__( 'Administrators', 'tlc-live-chat-with-telegram' ),
+			__( 'Administrators', 'tlc-live-chat-with-telegram' ),
 			'manage_options',
-			'tlc-administrators',
+			'tlcwt-administrators',
 			array( __CLASS__, 'render_administrators_page' )
 		);
 	}
@@ -472,8 +490,8 @@ public static function remove_administrator() {
 	public static function register_settings() {
 
 		register_setting(
-			'tlc_settings_group',
-			'tlc_settings',
+			'tlcwt_settings_group',
+			'tlcwt_settings',
 			array(
 				'sanitize_callback' => array(
 					__CLASS__,
@@ -486,110 +504,118 @@ public static function remove_administrator() {
 		 * Telegram section.
 		 */
 		add_settings_section(
-			'tlc_telegram_section',
-			__( 'Telegram Settings', 'telegram-live-chat' ),
+			'tlcwt_telegram_section',
+			__( 'Telegram Settings', 'tlc-live-chat-with-telegram' ),
 			array( __CLASS__, 'render_telegram_section' ),
-			'telegram-live-chat'
+			'tlc-live-chat-with-telegram'
 		);
 
 		add_settings_field(
-			'tlc_bot_token',
-			__( 'Bot Token', 'telegram-live-chat' ),
+			'tlcwt_bot_token',
+			__( 'Bot Token', 'tlc-live-chat-with-telegram' ),
 			array( __CLASS__, 'render_bot_token_field' ),
-			'telegram-live-chat',
-			'tlc_telegram_section'
+			'tlc-live-chat-with-telegram',
+			'tlcwt_telegram_section'
 		);
 
 		add_settings_field(
-			'tlc_connect_telegram',
-			__( 'Telegram Connection', 'telegram-live-chat' ),
+			'tlcwt_connect_telegram',
+			__( 'Telegram Connection', 'tlc-live-chat-with-telegram' ),
 			array( __CLASS__, 'render_connect_telegram_field' ),
-			'telegram-live-chat',
-			'tlc_telegram_section'
+			'tlc-live-chat-with-telegram',
+			'tlcwt_telegram_section'
 		);
 
 		/**
 		 * Chat section.
 		 */
 		add_settings_section(
-			'tlc_chat_section',
-			__( 'Chat Settings', 'telegram-live-chat' ),
+			'tlcwt_chat_section',
+			__( 'Chat Settings', 'tlc-live-chat-with-telegram' ),
 			array( __CLASS__, 'render_chat_section' ),
-			'telegram-live-chat'
+			'tlc-live-chat-with-telegram'
 		);
 
 		add_settings_field(
-			'tlc_welcome_message',
-			__( 'Welcome Message', 'telegram-live-chat' ),
+			'tlcwt_welcome_message',
+			__( 'Welcome Message', 'tlc-live-chat-with-telegram' ),
 			array( __CLASS__, 'render_welcome_message_field' ),
-			'telegram-live-chat',
-			'tlc_chat_section'
+			'tlc-live-chat-with-telegram',
+			'tlcwt_chat_section'
 		);
 
 		add_settings_field(
-			'tlc_offline_message',
-			__( 'Offline Message', 'telegram-live-chat' ),
+			'tlcwt_offline_message',
+			__( 'Offline Message', 'tlc-live-chat-with-telegram' ),
 			array( __CLASS__, 'render_offline_message_field' ),
-			'telegram-live-chat',
-			'tlc_chat_section'
+			'tlc-live-chat-with-telegram',
+			'tlcwt_chat_section'
 		);
 
 		add_settings_field(
-			'tlc_enabled',
-			__( 'Enable Chat', 'telegram-live-chat' ),
+			'tlcwt_enabled',
+			__( 'Enable Chat', 'tlc-live-chat-with-telegram' ),
 			array( __CLASS__, 'render_enabled_field' ),
-			'telegram-live-chat',
-			'tlc_chat_section'
+			'tlc-live-chat-with-telegram',
+			'tlcwt_chat_section'
 		);
 
 		add_settings_field(
-			'tlc_admin_status',
-			__( 'Admin Status', 'telegram-live-chat' ),
+			'tlcwt_appearance',
+			__( 'Widget Appearance', 'tlc-live-chat-with-telegram' ),
+			array( __CLASS__, 'render_appearance_field' ),
+			'tlc-live-chat-with-telegram',
+			'tlcwt_chat_section'
+		);
+
+		add_settings_field(
+			'tlcwt_admin_status',
+			__( 'Admin Status', 'tlc-live-chat-with-telegram' ),
 			array( __CLASS__, 'render_admin_status_field' ),
-			'telegram-live-chat',
-			'tlc_chat_section'
+			'tlc-live-chat-with-telegram',
+			'tlcwt_chat_section'
 		);
 
 		/**
 		 * Data management section.
 		 */
 		add_settings_section(
-			'tlc_data_section',
-			__( 'Data Management', 'telegram-live-chat' ),
+			'tlcwt_data_section',
+			__( 'Data Management', 'tlc-live-chat-with-telegram' ),
 			array( __CLASS__, 'render_data_section' ),
-			'telegram-live-chat'
+			'tlc-live-chat-with-telegram'
 		);
 
 		add_settings_field(
-			'tlc_delete_data',
-			__( 'Delete Data on Uninstall', 'telegram-live-chat' ),
+			'tlcwt_delete_data',
+			__( 'Delete Data on Uninstall', 'tlc-live-chat-with-telegram' ),
 			array( __CLASS__, 'render_delete_data_field' ),
-			'telegram-live-chat',
-			'tlc_data_section'
+			'tlc-live-chat-with-telegram',
+			'tlcwt_data_section'
 		);
 
 		add_settings_field(
-			'tlc_cleanup_frequency',
-			__( 'Cleanup Frequency', 'telegram-live-chat' ),
+			'tlcwt_cleanup_frequency',
+			__( 'Cleanup Frequency', 'tlc-live-chat-with-telegram' ),
 			array( __CLASS__, 'render_cleanup_frequency_field' ),
-			'telegram-live-chat',
-			'tlc_data_section'
+			'tlc-live-chat-with-telegram',
+			'tlcwt_data_section'
 		);
 
 		add_settings_field(
-			'tlc_cleanup_retention',
-			__( 'Data Retention', 'telegram-live-chat' ),
+			'tlcwt_cleanup_retention',
+			__( 'Data Retention', 'tlc-live-chat-with-telegram' ),
 			array( __CLASS__, 'render_cleanup_retention_field' ),
-			'telegram-live-chat',
-			'tlc_data_section'
+			'tlc-live-chat-with-telegram',
+			'tlcwt_data_section'
 		);
 
 		add_settings_field(
-			'tlc_cleanup_manual',
-			__( 'Manual Cleanup', 'telegram-live-chat' ),
+			'tlcwt_cleanup_manual',
+			__( 'Manual Cleanup', 'tlc-live-chat-with-telegram' ),
 			array( __CLASS__, 'render_cleanup_manual_field' ),
-			'telegram-live-chat',
-			'tlc_data_section'
+			'tlc-live-chat-with-telegram',
+			'tlcwt_data_section'
 		);
 	}
 
@@ -606,7 +632,7 @@ public static function remove_administrator() {
 			: array();
 
 		$existing_settings = get_option(
-			'tlc_settings',
+			'tlcwt_settings',
 			array()
 		);
 
@@ -677,6 +703,41 @@ public static function remove_administrator() {
 			$output['offline_message'] = sanitize_textarea_field(
 				$input['offline_message']
 			);
+		}
+
+		$appearance_defaults = array(
+			'widget_position' => 'right',
+			'primary_color' => '#2aabee',
+			'panel_color' => '#ffffff',
+			'desktop_width' => 340,
+			'desktop_height' => 480,
+			'mobile_width' => 340,
+			'mobile_height' => 420,
+			'desktop_bottom' => 24,
+			'mobile_bottom' => 60,
+			'header_text' => __( 'Support', 'tlc-live-chat-with-telegram' ),
+			'header_direction' => 'auto',
+			'icon_id' => 0,
+		);
+		$appearance = isset( $input['appearance'] ) && is_array( $input['appearance'] ) ? $input['appearance'] : array();
+		$output['appearance'] = isset( $existing_settings['appearance'] ) && is_array( $existing_settings['appearance'] )
+			? array_merge( $appearance_defaults, $existing_settings['appearance'] )
+			: $appearance_defaults;
+		if ( isset( $input['appearance'] ) && is_array( $input['appearance'] ) ) {
+			$a = $appearance;
+			$output['appearance']['widget_position'] = isset( $a['widget_position'] ) && in_array( $a['widget_position'], array( 'left', 'right' ), true ) ? $a['widget_position'] : 'right';
+			$primary_color = isset( $a['primary_color'] ) && is_string( $a['primary_color'] ) ? sanitize_hex_color( $a['primary_color'] ) : false;
+			$panel_color = isset( $a['panel_color'] ) && is_string( $a['panel_color'] ) ? sanitize_hex_color( $a['panel_color'] ) : false;
+			$output['appearance']['primary_color'] = $primary_color ? $primary_color : '#2aabee';
+			$output['appearance']['panel_color'] = $panel_color ? $panel_color : '#ffffff';
+			foreach ( array( 'desktop_width' => array( 280, 600, 340 ), 'desktop_height' => array( 320, 800, 480 ), 'mobile_width' => array( 260, 600, 340 ), 'mobile_height' => array( 300, 800, 420 ), 'desktop_bottom' => array( 0, 500, 24 ), 'mobile_bottom' => array( 0, 500, 60 ) ) as $key => $limits ) {
+				$value = isset( $a[ $key ] ) && is_scalar( $a[ $key ] ) ? absint( $a[ $key ] ) : $limits[2];
+				$output['appearance'][ $key ] = min( $limits[1], max( $limits[0], $value ) );
+			}
+			$output['appearance']['header_text'] = isset( $a['header_text'] ) && is_scalar( $a['header_text'] ) ? sanitize_text_field( (string) $a['header_text'] ) : 'Support';
+			$output['appearance']['header_direction'] = isset( $a['header_direction'] ) && in_array( $a['header_direction'], array( 'auto', 'ltr', 'rtl' ), true ) ? $a['header_direction'] : 'auto';
+			$icon_id = isset( $a['icon_id'] ) && is_scalar( $a['icon_id'] ) ? absint( $a['icon_id'] ) : 0;
+			$output['appearance']['icon_id'] = $icon_id && wp_attachment_is_image( $icon_id ) ? $icon_id : 0;
 		}
 
 		/**
@@ -761,7 +822,7 @@ public static function remove_administrator() {
 			/**
  * Reschedule cleanup when settings change.
  */
-TLC_Cleanup::reschedule();
+TLCWT_Cleanup::reschedule();
 
 
 		/**
@@ -769,7 +830,7 @@ TLC_Cleanup::reschedule();
 		 */
 		add_action(
 			'shutdown',
-			array( 'TLC_Cleanup', 'reschedule' )
+			array( 'TLCWT_Cleanup', 'reschedule' )
 		);
 
 		return $output;
@@ -783,7 +844,7 @@ TLC_Cleanup::reschedule();
 	);
 
 	$settings = get_option(
-		'tlc_settings',
+		'tlcwt_settings',
 		array()
 	);
 
@@ -791,15 +852,12 @@ TLC_Cleanup::reschedule();
 		? $settings
 		: array();
 
-	$settings['pairing_token_hash'] = hash(
-		'sha256',
-		$token
-	);
+	$settings['pairing_token_hash'] = wp_hash_password( $token );
 
 	$settings['pairing_expires_at'] = time() + ( 10 * MINUTE_IN_SECONDS );
 
 	update_option(
-		'tlc_settings',
+		'tlcwt_settings',
 		$settings
 	);
 
@@ -817,7 +875,7 @@ TLC_Cleanup::reschedule();
 			<?php
 			esc_html_e(
 				'Connect your Telegram bot to receive customer messages.',
-				'telegram-live-chat'
+				'tlc-live-chat-with-telegram'
 			);
 			?>
 		</p>
@@ -835,7 +893,7 @@ TLC_Cleanup::reschedule();
 			<?php
 			esc_html_e(
 				'Configure the website chat widget.',
-				'telegram-live-chat'
+				'tlc-live-chat-with-telegram'
 			);
 			?>
 		</p>
@@ -853,7 +911,7 @@ TLC_Cleanup::reschedule();
 			<?php
 			esc_html_e(
 				'Control how TLC stores and removes temporary conversation data.',
-				'telegram-live-chat'
+				'tlc-live-chat-with-telegram'
 			);
 			?>
 		</p>
@@ -868,7 +926,7 @@ TLC_Cleanup::reschedule();
 	public static function render_bot_token_field() {
 
 		$settings = get_option(
-			'tlc_settings',
+			'tlcwt_settings',
 			array()
 		);
 
@@ -879,7 +937,7 @@ TLC_Cleanup::reschedule();
 
 		<input
 			type="password"
-			name="tlc_settings[bot_token]"
+			name="tlcwt_settings[bot_token]"
 			value="<?php echo esc_attr( $value ); ?>"
 			class="regular-text"
 			autocomplete="new-password"
@@ -889,7 +947,7 @@ TLC_Cleanup::reschedule();
 			<?php
 			esc_html_e(
 				'Enter the token provided by BotFather.',
-				'telegram-live-chat'
+				'tlc-live-chat-with-telegram'
 			);
 			?>
 		</p>
@@ -904,15 +962,10 @@ TLC_Cleanup::reschedule();
 	 */
 	public static function render_connect_telegram_field() {
 
-		$connect_url = wp_nonce_url(
-			admin_url(
-				'admin-post.php?action=tlc_connect_telegram'
-			),
-			'tlc_connect_telegram'
-		);
+		$connect_post_url = admin_url( 'admin-post.php' );
 
 		$settings = get_option(
-			'tlc_settings',
+			'tlcwt_settings',
 			array()
 		);
 
@@ -921,17 +974,32 @@ TLC_Cleanup::reschedule();
 		);
 		?>
 
-		<a
-			href="<?php echo esc_url( $connect_url ); ?>"
+		<?php
+		/**
+		 * Dedicated nonce for the connect action, kept under its own field
+		 * name so it never collides with the settings-group nonce that
+		 * settings_fields() already prints in this same form.
+		 */
+		wp_nonce_field(
+			'tlcwt_connect_telegram',
+			'tlcwt_connect_nonce',
+			false
+		);
+		?>
+
+		<button
+			type="button"
+			id="tlcwt-connect-telegram"
 			class="button button-primary"
+			data-connect-url="<?php echo esc_url( $connect_post_url ); ?>"
 		>
 			<?php
 			esc_html_e(
 				'Connect Telegram',
-				'telegram-live-chat'
+				'tlc-live-chat-with-telegram'
 			);
 			?>
-		</a>
+		</button>
 
 		<?php if ( $connected ) : ?>
 
@@ -942,7 +1010,7 @@ TLC_Cleanup::reschedule();
 				<?php
 				esc_html_e(
 					'Telegram Connected',
-					'telegram-live-chat'
+					'tlc-live-chat-with-telegram'
 				);
 				?>
 			</p>
@@ -953,7 +1021,7 @@ TLC_Cleanup::reschedule();
 			<?php
 			esc_html_e(
 				'Connect your Telegram bot and configure the webhook automatically.',
-				'telegram-live-chat'
+				'tlc-live-chat-with-telegram'
 			);
 			?>
 		</p>
@@ -969,17 +1037,17 @@ TLC_Cleanup::reschedule();
 	public static function render_welcome_message_field() {
 
 		$settings = get_option(
-			'tlc_settings',
+			'tlcwt_settings',
 			array()
 		);
 
 		$value = isset( $settings['welcome_message'] )
 			? $settings['welcome_message']
-			: __( 'Hello! How can we help you?', 'telegram-live-chat' );
+			: __( 'Hello! How can we help you?', 'tlc-live-chat-with-telegram' );
 		?>
 
 		<textarea
-			name="tlc_settings[welcome_message]"
+			name="tlcwt_settings[welcome_message]"
 			rows="4"
 			class="large-text"
 		><?php echo esc_textarea( $value ); ?></textarea>
@@ -995,21 +1063,47 @@ TLC_Cleanup::reschedule();
 	public static function render_offline_message_field() {
 
 		$settings = get_option(
-			'tlc_settings',
+			'tlcwt_settings',
 			array()
 		);
 
 		$value = isset( $settings['offline_message'] )
 			? $settings['offline_message']
-			: __( 'We received your message and will reply as soon as possible.', 'telegram-live-chat' );
+			: __( 'We received your message and will reply as soon as possible.', 'tlc-live-chat-with-telegram' );
 		?>
 
 		<textarea
-			name="tlc_settings[offline_message]"
+			name="tlcwt_settings[offline_message]"
 			rows="4"
 			class="large-text"
 		><?php echo esc_textarea( $value ); ?></textarea>
 
+		<?php
+	}
+
+	/** Render widget design controls. */
+	public static function render_appearance_field() {
+		$settings = get_option( 'tlcwt_settings', array() );
+		$a = isset( $settings['appearance'] ) && is_array( $settings['appearance'] ) ? $settings['appearance'] : array();
+		$defaults = array( 'widget_position' => 'right', 'primary_color' => '#2aabee', 'panel_color' => '#ffffff', 'desktop_width' => 340, 'desktop_height' => 480, 'mobile_width' => 340, 'mobile_height' => 420, 'desktop_bottom' => 24, 'mobile_bottom' => 60, 'header_text' => __( 'Support', 'tlc-live-chat-with-telegram' ), 'header_direction' => 'auto', 'icon_id' => 0 );
+		$a = array_merge( $defaults, $a );
+		$icon_url = ! empty( $a['icon_id'] ) ? wp_get_attachment_image_url( absint( $a['icon_id'] ), 'thumbnail' ) : '';
+		$icon_url = $icon_url ? $icon_url : TLCWT_URL . 'assets/telegram-icon.svg';
+		$prefix = 'tlcwt_settings[appearance]';
+		?>
+		<div class="tlcwt-appearance-layout">
+			<div class="tlcwt-appearance-controls">
+				<label><?php esc_html_e( 'Widget position', 'tlc-live-chat-with-telegram' ); ?><br><select name="<?php echo esc_attr( $prefix ); ?>[widget_position]"><option value="right" <?php selected( $a['widget_position'], 'right' ); ?>><?php esc_html_e( 'Bottom right', 'tlc-live-chat-with-telegram' ); ?></option><option value="left" <?php selected( $a['widget_position'], 'left' ); ?>><?php esc_html_e( 'Bottom left', 'tlc-live-chat-with-telegram' ); ?></option></select></label>
+				<label><?php esc_html_e( 'Main color', 'tlc-live-chat-with-telegram' ); ?><br><input class="tlcwt-color" type="text" name="<?php echo esc_attr( $prefix ); ?>[primary_color]" value="<?php echo esc_attr( $a['primary_color'] ); ?>"></label>
+				<label><?php esc_html_e( 'Chat background', 'tlc-live-chat-with-telegram' ); ?><br><input class="tlcwt-color" type="text" name="<?php echo esc_attr( $prefix ); ?>[panel_color]" value="<?php echo esc_attr( $a['panel_color'] ); ?>"></label>
+				<label><?php esc_html_e( 'Header title', 'tlc-live-chat-with-telegram' ); ?><br><input type="text" class="regular-text" name="<?php echo esc_attr( $prefix ); ?>[header_text]" value="<?php echo esc_attr( $a['header_text'] ); ?>"></label>
+				<label><?php esc_html_e( 'Title direction', 'tlc-live-chat-with-telegram' ); ?><br><select name="<?php echo esc_attr( $prefix ); ?>[header_direction]"><option value="auto" <?php selected( $a['header_direction'], 'auto' ); ?>><?php esc_html_e( 'Automatic', 'tlc-live-chat-with-telegram' ); ?></option><option value="rtl" <?php selected( $a['header_direction'], 'rtl' ); ?>>RTL</option><option value="ltr" <?php selected( $a['header_direction'], 'ltr' ); ?>>LTR</option></select></label>
+				<?php foreach ( array( 'desktop_width' => __( 'Desktop width (px)', 'tlc-live-chat-with-telegram' ), 'desktop_height' => __( 'Desktop height (px)', 'tlc-live-chat-with-telegram' ), 'mobile_width' => __( 'Mobile width (px)', 'tlc-live-chat-with-telegram' ), 'mobile_height' => __( 'Mobile height (px)', 'tlc-live-chat-with-telegram' ), 'desktop_bottom' => __( 'Desktop distance from bottom (px)', 'tlc-live-chat-with-telegram' ), 'mobile_bottom' => __( 'Mobile distance from bottom (px)', 'tlc-live-chat-with-telegram' ) ) as $key => $label ) : ?>
+				<label><?php echo esc_html( $label ); ?><br><input type="number" min="<?php echo false !== strpos( $key, 'bottom' ) ? '0' : '260'; ?>" max="<?php echo false !== strpos( $key, 'bottom' ) ? '500' : '800'; ?>" step="1" name="<?php echo esc_attr( $prefix . '[' . $key . ']' ); ?>" value="<?php echo esc_attr( $a[ $key ] ); ?>"></label>
+				<?php endforeach; ?>
+				<div class="tlcwt-icon-picker"><span><?php esc_html_e( 'Chat icon', 'tlc-live-chat-with-telegram' ); ?></span><input type="hidden" name="<?php echo esc_attr( $prefix ); ?>[icon_id]" value="<?php echo esc_attr( absint( $a['icon_id'] ) ); ?>"><img class="tlcwt-icon-preview" src="<?php echo esc_url( $icon_url ); ?>" alt=""><button type="button" class="button" id="tlcwt-select-icon"><?php esc_html_e( 'Choose image', 'tlc-live-chat-with-telegram' ); ?></button><button type="button" class="button-link-delete" id="tlcwt-remove-icon" data-default-icon="<?php echo esc_url( TLCWT_URL . 'assets/telegram-icon.svg' ); ?>" <?php disabled( empty( $a['icon_id'] ) ); ?>><?php esc_html_e( 'Use default', 'tlc-live-chat-with-telegram' ); ?></button></div>
+			</div>
+		</div>
 		<?php
 	}
 
@@ -1021,7 +1115,7 @@ TLC_Cleanup::reschedule();
 	public static function render_enabled_field() {
 
 		$settings = get_option(
-			'tlc_settings',
+			'tlcwt_settings',
 			array()
 		);
 
@@ -1033,7 +1127,7 @@ TLC_Cleanup::reschedule();
 		<label>
 			<input
 				type="checkbox"
-				name="tlc_settings[enabled]"
+				name="tlcwt_settings[enabled]"
 				value="1"
 				<?php checked( $enabled, true ); ?>
 			>
@@ -1041,7 +1135,7 @@ TLC_Cleanup::reschedule();
 			<?php
 			esc_html_e(
 				'Enable the chat widget on the website.',
-				'telegram-live-chat'
+				'tlc-live-chat-with-telegram'
 			);
 			?>
 		</label>
@@ -1057,7 +1151,7 @@ TLC_Cleanup::reschedule();
 	public static function render_admin_status_field() {
 
 		$settings = get_option(
-			'tlc_settings',
+			'tlcwt_settings',
 			array()
 		);
 
@@ -1066,7 +1160,7 @@ TLC_Cleanup::reschedule();
 			: 'offline';
 		?>
 
-		<select name="tlc_settings[admin_status]">
+		<select name="tlcwt_settings[admin_status]">
 
 			<option
 				value="online"
@@ -1075,7 +1169,7 @@ TLC_Cleanup::reschedule();
 				<?php
 				esc_html_e(
 					'Online',
-					'telegram-live-chat'
+					'tlc-live-chat-with-telegram'
 				);
 				?>
 			</option>
@@ -1087,7 +1181,7 @@ TLC_Cleanup::reschedule();
 				<?php
 				esc_html_e(
 					'Offline',
-					'telegram-live-chat'
+					'tlc-live-chat-with-telegram'
 				);
 				?>
 			</option>
@@ -1098,7 +1192,7 @@ TLC_Cleanup::reschedule();
 			<?php
 			esc_html_e(
 				'Set whether the administrator is currently available to respond to visitors.',
-				'telegram-live-chat'
+				'tlc-live-chat-with-telegram'
 			);
 			?>
 		</p>
@@ -1114,7 +1208,7 @@ TLC_Cleanup::reschedule();
 	public static function render_delete_data_field() {
 
 		$settings = get_option(
-			'tlc_settings',
+			'tlcwt_settings',
 			array()
 		);
 
@@ -1126,7 +1220,7 @@ TLC_Cleanup::reschedule();
 		<label>
 			<input
 				type="checkbox"
-				name="tlc_settings[delete_data_on_uninstall]"
+				name="tlcwt_settings[delete_data_on_uninstall]"
 				value="1"
 				<?php checked( $delete_data, true ); ?>
 			>
@@ -1134,7 +1228,7 @@ TLC_Cleanup::reschedule();
 			<?php
 			esc_html_e(
 				'Delete all plugin data when the plugin is uninstalled.',
-				'telegram-live-chat'
+				'tlc-live-chat-with-telegram'
 			);
 			?>
 		</label>
@@ -1143,7 +1237,7 @@ TLC_Cleanup::reschedule();
 			<?php
 			esc_html_e(
 				'This permanently deletes conversations, messages, settings, and plugin database tables.',
-				'telegram-live-chat'
+				'tlc-live-chat-with-telegram'
 			);
 			?>
 		</p>
@@ -1154,7 +1248,7 @@ TLC_Cleanup::reschedule();
 				<?php
 				esc_html_e(
 					'Warning: Plugin data will be permanently deleted when the plugin is uninstalled.',
-					'telegram-live-chat'
+					'tlc-live-chat-with-telegram'
 				);
 				?>
 			</p>
@@ -1172,7 +1266,7 @@ TLC_Cleanup::reschedule();
 	public static function render_cleanup_frequency_field() {
 
 		$settings = get_option(
-			'tlc_settings',
+			'tlcwt_settings',
 			array()
 		);
 
@@ -1181,22 +1275,22 @@ TLC_Cleanup::reschedule();
 			: 'weekly';
 		?>
 
-		<select name="tlc_settings[cleanup_frequency]">
+		<select name="tlcwt_settings[cleanup_frequency]">
 
 			<option value="daily" <?php selected( $value, 'daily' ); ?>>
-				<?php esc_html_e( 'Every 24 hours', 'telegram-live-chat' ); ?>
+				<?php esc_html_e( 'Every 24 hours', 'tlc-live-chat-with-telegram' ); ?>
 			</option>
 
 			<option value="weekly" <?php selected( $value, 'weekly' ); ?>>
-				<?php esc_html_e( 'Every 7 days', 'telegram-live-chat' ); ?>
+				<?php esc_html_e( 'Every 7 days', 'tlc-live-chat-with-telegram' ); ?>
 			</option>
 
 			<option value="monthly" <?php selected( $value, 'monthly' ); ?>>
-				<?php esc_html_e( 'Monthly', 'telegram-live-chat' ); ?>
+				<?php esc_html_e( 'Monthly', 'tlc-live-chat-with-telegram' ); ?>
 			</option>
 
 			<option value="never" <?php selected( $value, 'never' ); ?>>
-				<?php esc_html_e( 'Never', 'telegram-live-chat' ); ?>
+				<?php esc_html_e( 'Never', 'tlc-live-chat-with-telegram' ); ?>
 			</option>
 
 		</select>
@@ -1205,7 +1299,7 @@ TLC_Cleanup::reschedule();
 			<?php
 			esc_html_e(
 				'Choose how often old closed conversations should be cleaned.',
-				'telegram-live-chat'
+				'tlc-live-chat-with-telegram'
 			);
 			?>
 		</p>
@@ -1221,7 +1315,7 @@ TLC_Cleanup::reschedule();
 	public static function render_cleanup_retention_field() {
 
 		$settings = get_option(
-			'tlc_settings',
+			'tlcwt_settings',
 			array()
 		);
 
@@ -1230,26 +1324,26 @@ TLC_Cleanup::reschedule();
 			: '30';
 		?>
 
-		<select name="tlc_settings[cleanup_retention]">
+		<select name="tlcwt_settings[cleanup_retention]">
 
 			<option value="7" <?php selected( $value, '7' ); ?>>
-				<?php esc_html_e( '7 days', 'telegram-live-chat' ); ?>
+				<?php esc_html_e( '7 days', 'tlc-live-chat-with-telegram' ); ?>
 			</option>
 
 			<option value="30" <?php selected( $value, '30' ); ?>>
-				<?php esc_html_e( '30 days', 'telegram-live-chat' ); ?>
+				<?php esc_html_e( '30 days', 'tlc-live-chat-with-telegram' ); ?>
 			</option>
 
 			<option value="90" <?php selected( $value, '90' ); ?>>
-				<?php esc_html_e( '90 days', 'telegram-live-chat' ); ?>
+				<?php esc_html_e( '90 days', 'tlc-live-chat-with-telegram' ); ?>
 			</option>
 
 			<option value="180" <?php selected( $value, '180' ); ?>>
-				<?php esc_html_e( '6 months', 'telegram-live-chat' ); ?>
+				<?php esc_html_e( '6 months', 'tlc-live-chat-with-telegram' ); ?>
 			</option>
 
 			<option value="365" <?php selected( $value, '365' ); ?>>
-				<?php esc_html_e( '1 year', 'telegram-live-chat' ); ?>
+				<?php esc_html_e( '1 year', 'tlc-live-chat-with-telegram' ); ?>
 			</option>
 
 		</select>
@@ -1258,7 +1352,7 @@ TLC_Cleanup::reschedule();
 			<?php
 			esc_html_e(
 				'Only old closed conversations will be removed. Active conversations are never removed by this cleanup.',
-				'telegram-live-chat'
+				'tlc-live-chat-with-telegram'
 			);
 			?>
 		</p>
@@ -1275,9 +1369,9 @@ TLC_Cleanup::reschedule();
 
 		$url = wp_nonce_url(
 			admin_url(
-				'admin-post.php?action=tlc_run_cleanup'
+				'admin-post.php?action=tlcwt_run_cleanup'
 			),
-			'tlc_run_cleanup'
+			'tlcwt_run_cleanup'
 		);
 		?>
 
@@ -1288,7 +1382,7 @@ TLC_Cleanup::reschedule();
 			<?php
 			esc_html_e(
 				'Run Cleanup Now',
-				'telegram-live-chat'
+				'tlc-live-chat-with-telegram'
 			);
 			?>
 		</a>
@@ -1297,7 +1391,7 @@ TLC_Cleanup::reschedule();
 			<?php
 			esc_html_e(
 				'This removes only old closed conversations according to your retention setting.',
-				'telegram-live-chat'
+				'tlc-live-chat-with-telegram'
 			);
 			?>
 		</p>
@@ -1316,22 +1410,22 @@ TLC_Cleanup::reschedule();
 			wp_die(
 				esc_html__(
 					'You do not have permission to perform this action.',
-					'telegram-live-chat'
+					'tlc-live-chat-with-telegram'
 				)
 			);
 		}
 
 		check_admin_referer(
-			'tlc_run_cleanup'
+			'tlcwt_run_cleanup'
 		);
 
-		TLC_Cleanup::run();
+		TLCWT_Cleanup::run();
 
 		wp_safe_redirect(
 			add_query_arg(
 				array(
-					'page'        => 'telegram-live-chat',
-					'tlc_cleaned' => '1',
+					'page'        => 'tlc-live-chat-with-telegram',
+					'tlcwt_cleaned' => '1',
 				),
 				admin_url( 'admin.php' )
 			)
@@ -1353,17 +1447,41 @@ TLC_Cleanup::reschedule();
 			wp_die(
 				esc_html__(
 					'You do not have permission to perform this action.',
-					'telegram-live-chat'
+					'tlc-live-chat-with-telegram'
 				)
 			);
 		}
 
 		check_admin_referer(
-			'tlc_connect_telegram'
+			'tlcwt_connect_telegram',
+			'tlcwt_connect_nonce'
 		);
 
+		/**
+		 * The Connect Telegram button submits the whole settings form.
+		 * If it carried field values (e.g. a bot token the admin just
+		 * typed but never explicitly saved), persist them first using
+		 * the same sanitize callback the normal Save Changes flow uses,
+		 * so connecting never runs against a stale saved token.
+		 */
+		if ( isset( $_POST['tlcwt_settings'] ) && is_array( $_POST['tlcwt_settings'] ) ) {
+
+			$submitted_settings = wp_unslash(
+				$_POST['tlcwt_settings']
+			);
+
+			$sanitized_settings = self::sanitize_settings(
+				$submitted_settings
+			);
+
+			update_option(
+				'tlcwt_settings',
+				$sanitized_settings
+			);
+		}
+
 		$settings = get_option(
-			'tlc_settings',
+			'tlcwt_settings',
 			array()
 		);
 
@@ -1389,7 +1507,7 @@ TLC_Cleanup::reschedule();
 		if ( empty( $bot_token ) ) {
 
 			update_option(
-				'tlc_settings',
+				'tlcwt_settings',
 				$settings
 			);
 
@@ -1401,14 +1519,14 @@ TLC_Cleanup::reschedule();
 		/**
  * Retrieve Telegram bot information.
  */
-$bot_info = TLC_Telegram::get_me();
+$bot_info = TLCWT_Telegram::get_me();
 
 if ( is_wp_error( $bot_info ) ) {
 
 	$settings['telegram_connected'] = false;
 
 	update_option(
-		'tlc_settings',
+		'tlcwt_settings',
 		$settings
 	);
 
@@ -1432,25 +1550,29 @@ if ( empty( $bot_username ) ) {
 	$settings['telegram_connected'] = false;
 
 	update_option(
-		'tlc_settings',
+		'tlcwt_settings',
 		$settings
 	);
 
 	self::redirect_connection_error(
-		'tlc_bot_username_missing'
+		'tlcwt_bot_username_missing'
 	);
 }
 
 $settings['bot_username'] = $bot_username;
 
 update_option(
-	'tlc_settings',
+	'tlcwt_settings',
 	$settings
 );
 /**
  * Generate a new one-time pairing token.
  */
 $pairing_token = self::generate_pairing_token();
+$settings = get_option( 'tlcwt_settings', array() );
+$settings = is_array( $settings ) ? $settings : array();
+$settings['pairing_token_plain'] = $pairing_token;
+update_option( 'tlcwt_settings', $settings );
 /**
  * Build Telegram pairing deep link.
  */
@@ -1473,7 +1595,7 @@ $pairing_url = sprintf(
 			);
 
 			update_option(
-				'tlc_settings',
+				'tlcwt_settings',
 				$settings
 			);
 		}
@@ -1481,14 +1603,14 @@ $pairing_url = sprintf(
 		/**
 		 * Register webhook.
 		 */
-		$result = TLC_Telegram::set_webhook();
+		$result = TLCWT_Telegram::set_webhook();
 
 		if ( is_wp_error( $result ) ) {
 
 			$settings['telegram_connected'] = false;
 
 			update_option(
-				'tlc_settings',
+				'tlcwt_settings',
 				$settings
 			);
 
@@ -1507,7 +1629,7 @@ $pairing_url = sprintf(
 			$settings['telegram_connected'] = false;
 
 			update_option(
-				'tlc_settings',
+				'tlcwt_settings',
 				$settings
 			);
 
@@ -1527,7 +1649,7 @@ $pairing_url = sprintf(
 			$settings['telegram_connected'] = false;
 
 			update_option(
-				'tlc_settings',
+				'tlcwt_settings',
 				$settings
 			);
 
@@ -1537,7 +1659,7 @@ $pairing_url = sprintf(
 		}
 
 		$expected_webhook_url = rest_url(
-			'tlc/v1/telegram/webhook'
+			'tlcwt/v1/telegram/webhook'
 		);
 
 		if (
@@ -1548,7 +1670,7 @@ $pairing_url = sprintf(
 			$settings['telegram_connected'] = false;
 
 			update_option(
-				'tlc_settings',
+				'tlcwt_settings',
 				$settings
 			);
 
@@ -1563,15 +1685,15 @@ $pairing_url = sprintf(
 		$settings['telegram_connected'] = true;
 
 		update_option(
-			'tlc_settings',
+			'tlcwt_settings',
 			$settings
 		);
 
 		wp_safe_redirect(
 			add_query_arg(
 				array(
-					'page'          => 'telegram-live-chat',
-					'tlc_connected' => '1',
+					'page'          => 'tlcwt-administrators',
+					'tlcwt_connected' => '1',
 				),
 				admin_url( 'admin.php' )
 			)
@@ -1591,8 +1713,8 @@ $pairing_url = sprintf(
 		wp_safe_redirect(
 			add_query_arg(
 				array(
-					'page'      => 'telegram-live-chat',
-					'tlc_error' => sanitize_key( $error ),
+					'page'      => 'tlc-live-chat-with-telegram',
+					'tlcwt_error' => sanitize_key( $error ),
 				),
 				admin_url( 'admin.php' )
 			)
@@ -1609,7 +1731,7 @@ $pairing_url = sprintf(
 	public static function get_webhook_info() {
 
 		$settings = get_option(
-			'tlc_settings',
+			'tlcwt_settings',
 			array()
 		);
 
@@ -1628,10 +1750,10 @@ $pairing_url = sprintf(
 		if ( empty( $token ) ) {
 
 			return new WP_Error(
-				'tlc_missing_bot_token',
+				'tlcwt_missing_bot_token',
 				__(
 					'Telegram bot token is not configured.',
-					'telegram-live-chat'
+					'tlc-live-chat-with-telegram'
 				)
 			);
 		}
@@ -1651,7 +1773,7 @@ $pairing_url = sprintf(
 		if ( is_wp_error( $response ) ) {
 
 			return new WP_Error(
-				'tlc_telegram_connection_error',
+				'tlcwt_telegram_connection_error',
 				$response->get_error_message()
 			);
 		}
@@ -1677,11 +1799,11 @@ $pairing_url = sprintf(
 				? $body['description']
 				: __(
 					'Could not retrieve Telegram webhook information.',
-					'telegram-live-chat'
+					'tlc-live-chat-with-telegram'
 				);
 
 			return new WP_Error(
-				'tlc_telegram_webhook_info_error',
+				'tlcwt_telegram_webhook_info_error',
 				$error_message,
 				array(
 					'status' => $status_code,
@@ -1706,19 +1828,19 @@ $pairing_url = sprintf(
 
 		?>
 
-		<div class="wrap tlc-admin-page">
+		<div class="wrap tlcwt-admin-page">
 
-			<h1 class="tlc-admin-title">
-				<img src="<?php echo esc_url( TLC_URL . 'assets/telegram-icon.svg' ); ?>" alt="" aria-hidden="true">
+			<h1 class="tlcwt-admin-title">
+				<img src="<?php echo esc_url( TLCWT_URL . 'assets/telegram-icon.svg' ); ?>" alt="" aria-hidden="true">
 				<?php
 				esc_html_e(
 					'TLC - Live chat with Telegram',
-					'telegram-live-chat'
+					'tlc-live-chat-with-telegram'
 				);
 				?>
 			</h1>
 
-			<?php if ( filter_input( INPUT_GET, 'tlc_connected', FILTER_VALIDATE_INT ) ) : ?>
+			<?php if ( filter_input( INPUT_GET, 'tlcwt_connected', FILTER_VALIDATE_INT ) ) : ?>
 
 				<div class="notice notice-success is-dismissible">
 					<p>
@@ -1726,7 +1848,7 @@ $pairing_url = sprintf(
 							<?php
 							esc_html_e(
 								'Telegram connected successfully.',
-								'telegram-live-chat'
+								'tlc-live-chat-with-telegram'
 							);
 							?>
 						</strong>
@@ -1735,14 +1857,14 @@ $pairing_url = sprintf(
 
 			<?php endif; ?>
 
-			<?php if ( filter_input( INPUT_GET, 'tlc_cleaned', FILTER_VALIDATE_INT ) ) : ?>
+			<?php if ( filter_input( INPUT_GET, 'tlcwt_cleaned', FILTER_VALIDATE_INT ) ) : ?>
 
 				<div class="notice notice-success is-dismissible">
 					<p>
 						<?php
 						esc_html_e(
 							'Cleanup completed successfully.',
-							'telegram-live-chat'
+							'tlc-live-chat-with-telegram'
 						);
 						?>
 					</p>
@@ -1750,14 +1872,14 @@ $pairing_url = sprintf(
 
 			<?php endif; ?>
 
-			<?php if ( filter_input( INPUT_GET, 'tlc_error', FILTER_UNSAFE_RAW ) ) : ?>
+			<?php if ( filter_input( INPUT_GET, 'tlcwt_error', FILTER_UNSAFE_RAW ) ) : ?>
 
 				<div class="notice notice-error is-dismissible">
 					<p>
 
 						<?php
 
-						$error = sanitize_key( (string) filter_input( INPUT_GET, 'tlc_error', FILTER_UNSAFE_RAW ) );
+						$error = sanitize_key( (string) filter_input( INPUT_GET, 'tlcwt_error', FILTER_UNSAFE_RAW ) );
 
 						switch ( $error ) {
 
@@ -1765,7 +1887,7 @@ $pairing_url = sprintf(
 
 								esc_html_e(
 									'Bot Token is required.',
-									'telegram-live-chat'
+									'tlc-live-chat-with-telegram'
 								);
 
 								break;
@@ -1774,52 +1896,52 @@ $pairing_url = sprintf(
 
 								esc_html_e(
 									'Admin Chat ID is required.',
-									'telegram-live-chat'
+									'tlc-live-chat-with-telegram'
 								);
 
 								break;
 
-							case 'tlc_missing_webhook_secret':
+							case 'tlcwt_missing_webhook_secret':
 
 								esc_html_e(
 									'Webhook Secret is missing.',
-									'telegram-live-chat'
+									'tlc-live-chat-with-telegram'
 								);
 
 								break;
 
-							case 'tlc_invalid_webhook_secret':
+							case 'tlcwt_invalid_webhook_secret':
 
 								esc_html_e(
 									'Webhook Secret contains invalid characters.',
-									'telegram-live-chat'
+									'tlc-live-chat-with-telegram'
 								);
 
 								break;
 
-							case 'tlc_telegram_connection_error':
+							case 'tlcwt_telegram_connection_error':
 
 								esc_html_e(
 									'Could not connect to Telegram.',
-									'telegram-live-chat'
+									'tlc-live-chat-with-telegram'
 								);
 
 								break;
 
-							case 'tlc_telegram_webhook_error':
+							case 'tlcwt_telegram_webhook_error':
 
 								esc_html_e(
 									'Telegram rejected the webhook registration.',
-									'telegram-live-chat'
+									'tlc-live-chat-with-telegram'
 								);
 
 								break;
 
-							case 'tlc_telegram_webhook_info_error':
+							case 'tlcwt_telegram_webhook_info_error':
 
 								esc_html_e(
 									'Could not verify the Telegram webhook.',
-									'telegram-live-chat'
+									'tlc-live-chat-with-telegram'
 								);
 
 								break;
@@ -1828,7 +1950,7 @@ $pairing_url = sprintf(
 
 								esc_html_e(
 									'Telegram webhook was not registered.',
-									'telegram-live-chat'
+									'tlc-live-chat-with-telegram'
 								);
 
 								break;
@@ -1837,7 +1959,7 @@ $pairing_url = sprintf(
 
 								esc_html_e(
 									'Telegram webhook URL does not match this website.',
-									'telegram-live-chat'
+									'tlc-live-chat-with-telegram'
 								);
 
 								break;
@@ -1846,7 +1968,7 @@ $pairing_url = sprintf(
 
 								esc_html_e(
 									'Could not connect to Telegram. Please check your Bot Token and settings.',
-									'telegram-live-chat'
+									'tlc-live-chat-with-telegram'
 								);
 
 								break;
@@ -1860,6 +1982,7 @@ $pairing_url = sprintf(
 			<?php endif; ?>
 
 			<form
+				id="tlcwt-settings-form"
 				method="post"
 				action="options.php"
 			>
@@ -1867,11 +1990,11 @@ $pairing_url = sprintf(
 				<?php
 
 				settings_fields(
-					'tlc_settings_group'
+					'tlcwt_settings_group'
 				);
 
 				do_settings_sections(
-					'telegram-live-chat'
+					'tlc-live-chat-with-telegram'
 				);
 
 				submit_button();

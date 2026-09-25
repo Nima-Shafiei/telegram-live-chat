@@ -4,7 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class TLC_Cleanup {
+class TLCWT_Cleanup {
 
 	/**
 	 * Initialize cleanup system.
@@ -19,7 +19,7 @@ class TLC_Cleanup {
 		);
 
 		add_action(
-			'tlc_cleanup_event',
+			'tlcwt_cleanup_event',
 			array( __CLASS__, 'run' )
 		);
 
@@ -44,7 +44,7 @@ public static function reschedule() {
 	public static function add_cron_schedules( $schedules ) {
 
 		$interval = (int) get_option(
-			'tlc_cleanup_interval_seconds',
+			'tlcwt_cleanup_interval_seconds',
 			7 * DAY_IN_SECONDS
 		);
 
@@ -52,11 +52,11 @@ public static function reschedule() {
 			$interval = DAY_IN_SECONDS;
 		}
 
-		$schedules['tlc_cleanup_interval'] = array(
+		$schedules['tlcwt_cleanup_interval'] = array(
 			'interval' => $interval,
 			'display'  => __(
 				'Telegram Live Chat Cleanup',
-				'telegram-live-chat'
+				'tlc-live-chat-with-telegram'
 			),
 		);
 
@@ -71,18 +71,18 @@ public static function reschedule() {
 	private static function unschedule_event() {
 
 		$timestamp = wp_next_scheduled(
-			'tlc_cleanup_event'
+			'tlcwt_cleanup_event'
 		);
 
 		while ( $timestamp ) {
 
 			wp_unschedule_event(
 				$timestamp,
-				'tlc_cleanup_event'
+				'tlcwt_cleanup_event'
 			);
 
 			$timestamp = wp_next_scheduled(
-				'tlc_cleanup_event'
+				'tlcwt_cleanup_event'
 			);
 		}
 	}
@@ -95,7 +95,7 @@ public static function reschedule() {
 	private static function schedule_event() {
 
 		$settings = get_option(
-			'tlc_settings',
+			'tlcwt_settings',
 			array()
 		);
 
@@ -143,7 +143,7 @@ public static function reschedule() {
 		 * registering the cron event.
 		 */
 		update_option(
-			'tlc_cleanup_interval_seconds',
+			'tlcwt_cleanup_interval_seconds',
 			$interval
 		);
 
@@ -162,8 +162,8 @@ public static function reschedule() {
 		 */
 		wp_schedule_event(
 			time() + HOUR_IN_SECONDS,
-			'tlc_cleanup_interval',
-			'tlc_cleanup_event'
+			'tlcwt_cleanup_interval',
+			'tlcwt_cleanup_event'
 		);
 	}
 
@@ -175,7 +175,7 @@ public static function reschedule() {
 	public static function run() {
 
 		$settings = get_option(
-			'tlc_settings',
+			'tlcwt_settings',
 			array()
 		);
 
@@ -234,8 +234,8 @@ public static function reschedule() {
 
 		global $wpdb;
 
-		$conversations_table = TLC_Database::conversations_table();
-		$messages_table      = TLC_Database::messages_table();
+		$conversations_table = TLCWT_Database::conversations_table();
+		$messages_table      = TLCWT_Database::messages_table();
 
 		$cutoff = gmdate(
 			'Y-m-d H:i:s',

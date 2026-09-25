@@ -4,7 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class TLC_Database {
+class TLCWT_Database {
 
 	/**
 	 * Current database schema version.
@@ -19,7 +19,7 @@ class TLC_Database {
 	public static function conversations_table() {
 		global $wpdb;
 
-		return $wpdb->prefix . 'tlc_conversations';
+		return $wpdb->prefix . 'tlcwt_conversations';
 	}
 
 	/**
@@ -30,7 +30,7 @@ class TLC_Database {
 	public static function messages_table() {
 		global $wpdb;
 
-		return $wpdb->prefix . 'tlc_messages';
+		return $wpdb->prefix . 'tlcwt_messages';
 	}
 
 	/**
@@ -83,7 +83,7 @@ class TLC_Database {
 		dbDelta( $sql_messages );
 
 		update_option(
-			'tlc_db_version',
+			'tlcwt_db_version',
 			self::DB_VERSION
 		);
 	}
@@ -95,7 +95,7 @@ class TLC_Database {
 	 */
 	public static function maybe_upgrade() {
 
-		$installed_version = get_option( 'tlc_db_version', '0.0.0' );
+		$installed_version = get_option( 'tlcwt_db_version', '0.0.0' );
 
 		if ( version_compare( $installed_version, self::DB_VERSION, '<' ) ) {
 			self::install();

@@ -1,6 +1,6 @@
 <?php
 /**
- * Settings are rendered by TLC_Admin::render_settings_page().
+ * Settings are rendered by TLCWT_Admin::render_settings_page().
  *
  * This file remains for backwards compatibility with earlier plugin layouts.
  */

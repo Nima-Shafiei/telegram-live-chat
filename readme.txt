@@ -4,104 +4,83 @@ Tags: telegram, live chat, customer support, chat, support
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Connect a website chat widget to Telegram so visitors can message your support team in real time.
+Connect your WordPress website chat with Telegram and reply to customer messages directly from Telegram.
 
 == Description ==
 
-TLC – Live Chat for Telegram lets website visitors chat with your support team directly from your website, while administrators receive and reply to conversations through Telegram.
+**Read the Installation section first.** It walks you through connecting your bot and pairing your Telegram account, step by step.
 
-Unlike traditional live chat plugins that require administrators to monitor a separate WordPress dashboard, TLC Chat routes visitor conversations to Telegram, allowing your support team to respond directly from Telegram.
+TLC - Live chat with Telegram adds a chat widget to your website. Visitors send messages from your site, and your support team receives and answers them in Telegram.
 
-Key features:
+Features include:
 
-* Real-time website chat widget
-* Receive visitor messages in Telegram
-* Reply to visitors directly from Telegram
-* Multiple Telegram administrators
-* Online/offline chat status
-* Custom welcome and offline messages
-* Lightweight REST API-based communication
-* No separate WordPress chat dashboard required for replying to visitors
+* Real-time website chat connected to your Telegram bot.
+* Reply to visitors directly from Telegram.
+* Pair an owner and additional Telegram administrators.
+* Customize widget colors, title, icon, desktop and mobile size, position, and distance from the bottom of the screen.
+* Set welcome and offline messages.
+* No separate WordPress chat dashboard is needed to reply.
 
 == Installation ==
 
-1. Upload the `tlc-live-chat-with-telegram` folder to the `/wp-content/plugins/` directory, or install the ZIP file from the WordPress Plugins screen.
-2. Activate Telegram Live Chat through the Plugins screen in WordPress.
-3. Open **TLC > Settings** and save the token supplied by BotFather.
-4. Select **Connect Telegram** to verify the bot and register its webhook.
-5. Open **TLC > Administrators**, generate a pairing link, and open it from the Telegram account that will be the owner.
-6. Generate another pairing link for each additional administrator. Administrators must reply to a visitor message in Telegram for their response to appear on the website.
+1. Create a Telegram bot with [@BotFather](https://t.me/BotFather) and copy its token.
+2. In WordPress, install and activate **TLC - Live chat with Telegram**.
+3. Open **TLC > Settings**, paste the token into the **Bot Token** field, then select **Connect Telegram**.
+4. Select **Save Changes**. After Telegram connects, the plugin opens the Administrators page and creates a temporary pairing link for the owner.
+5. Open that link in Telegram and press **Start**. Your Telegram account is now the owner.
+6. To add another administrator, select **Generate Pairing Link** and send the link to them. They must open it in Telegram and press **Start**. Pairing links expire after 10 minutes.
+7. Customize the widget in **TLC > Settings** and select **Save Changes** to apply the settings.
 
-== Disclaimer ==
+When setup is complete, visitor messages are sent to your paired Telegram administrators. Reply to a message in Telegram to answer the visitor on your website.
 
-TLC Chat is an independent third-party plugin and is not affiliated with, endorsed by, or sponsored by Telegram.
+== Screenshots ==
+
+1. Enter your BotFather token and connect Telegram.
+2. Save your plugin settings.
+3. Open the owner pairing link in Telegram and press Start.
+4. Generate a pairing link for another administrator.
+5. View paired Telegram administrators and their roles.
+6. Customize the widget appearance.
 
 == External services ==
 
-This plugin connects to the Telegram Bot API to provide website-to-Telegram live chat functionality.
+This plugin connects to the Telegram Bot API to validate the configured bot, configure its webhook, send visitor messages to paired administrators, and receive administrator replies.
 
-The Telegram Bot API is provided by Telegram. The plugin uses this service to:
+When a visitor sends a message, the message, conversation ID, and page URL (when available) may be sent to Telegram. Telegram sends administrator replies and associated Telegram chat information to this site's webhook so the plugin can identify the administrator and conversation.
 
-* Verify the configured Telegram bot.
-* Register and verify the webhook used to receive administrator messages and pairing requests.
-* Send visitor messages from the website to the configured Telegram administrators.
-* Receive administrator replies and display them to the corresponding website visitor.
-
-When a visitor sends a chat message, the following information may be sent to the Telegram Bot API:
-
-* The visitor's message.
-* The conversation ID generated by the plugin.
-* The URL of the page where the message was sent, when available.
-
-When an administrator replies through Telegram, Telegram sends the message and the associated Telegram chat information to the plugin's webhook. The plugin uses this information to identify the administrator and the related conversation.
+Telegram's terms and privacy policy:
+https://telegram.org/tos
+https://telegram.org/privacy
 
 == Privacy ==
 
-The plugin generates a temporary visitor ID and stores it in the browser's session storage to associate messages with the current chat conversation. This identifier is not used for analytics, advertising, or tracking.
-
-The visitor's IP address may be temporarily processed by the plugin for rate limiting and abuse prevention. It is not sent to Telegram.
-
-The plugin stores conversation and message data in the WordPress database to provide the chat functionality.
-
-The plugin also sends the configured Telegram bot token as part of authenticated requests to the Telegram Bot API. The bot token is stored in the WordPress database and is used only to authenticate requests to Telegram.
-
-The Telegram Bot API is contacted when the plugin verifies the bot, registers or checks the webhook, sends a visitor message to an administrator, or receives a Telegram webhook update.
-
-Telegram Privacy Policy: https://telegram.org/privacy
-
-Telegram Terms of Service: https://telegram.org/tos
-
-== Why TLC Chat? ==
-
-TLC Chat is designed for teams that already use Telegram for customer support.
-
-Instead of requiring administrators to continuously monitor a separate WordPress chat dashboard, TLC Chat sends website conversations directly to Telegram. Administrators can read and reply to visitor messages from Telegram while visitors continue chatting through the website widget.
-
-This approach keeps the website chat experience simple for visitors while allowing support teams to manage conversations from a communication platform they already use.
+The plugin stores conversation and message data in the WordPress database. It uses a temporary visitor ID in the browser's session storage to associate messages with a conversation. The visitor's IP address may be temporarily processed for rate limiting and abuse prevention; it is not sent to Telegram. The Telegram bot token is stored in WordPress and used to authenticate Telegram Bot API requests.
 
 == Frequently Asked Questions ==
 
-= Is a Telegram account required? =
+= How do I connect my bot? =
 
-Yes. A Telegram account is required to connect the plugin with your Telegram bot and manage visitor conversations.
-
-= Does the plugin need a Telegram bot? =
-
-Yes. Create a bot with BotFather and enter its token in the plugin settings.
+Create a bot with [@BotFather](https://t.me/BotFather), enter its token in **TLC > Settings**, and select **Connect Telegram**. Save your settings, then open the owner pairing link in Telegram and press **Start**.
 
 = How do I add another administrator? =
 
-Open **TLC > Administrators**, select **Generate Pairing Link**, and send the link to the administrator. The first paired account remains the owner; later accounts are added as administrators.
+Open **TLC > Administrators**, select **Generate Pairing Link**, and send the temporary link to the administrator. They need to open it in Telegram and press **Start**.
 
-= Can I remove an administrator? =
+= Can I customize the chat widget? =
 
-Yes. On the Administrators screen, select **Remove** next to that administrator. The owner cannot be removed through this screen.
+Yes. The settings let you choose the position, colors, title, icon, desktop and mobile dimensions, and distance from the bottom of the screen.
 
 == Changelog ==
+
+= 1.1.0 =
+* Added chat widget appearance settings for position, colors, title direction, desktop and mobile size, bottom spacing, and custom icon.
+* Improved Telegram connection flow with automatic navigation to administrator pairing.
+* Added cleanup settings for conversation data.
+* Added a LinkedIn link for the plugin author.
 
 = 1.0.0 =
 * Initial stable release.
@@ -113,4 +92,3 @@ Yes. On the Administrators screen, select **Remove** next to that administrator.
 * Added support for multiple Telegram administrators.
 * Refined the Telegram-inspired chat interface.
 * Resolved Plugin Check compatibility findings.
-

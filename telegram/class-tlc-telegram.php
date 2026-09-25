@@ -4,7 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class TLC_Telegram {
+class TLCWT_Telegram {
 
 	/**
 	 * Initialize Telegram functionality.
@@ -25,7 +25,7 @@ class TLC_Telegram {
 	private static function get_settings() {
 
 		$settings = get_option(
-			'tlc_settings',
+			'tlcwt_settings',
 			array()
 		);
 
@@ -58,10 +58,10 @@ public static function get_me() {
 
 	if ( empty( $token ) ) {
 		return new WP_Error(
-			'tlc_missing_bot_token',
+			'tlcwt_missing_bot_token',
 			__(
 				'Telegram bot token is not configured.',
-				'telegram-live-chat'
+				'tlc-live-chat-with-telegram'
 			)
 		);
 	}
@@ -77,7 +77,7 @@ public static function get_me() {
 
 	if ( is_wp_error( $response ) ) {
 		return new WP_Error(
-			'tlc_telegram_connection_error',
+			'tlcwt_telegram_connection_error',
 			$response->get_error_message()
 		);
 	}
@@ -101,11 +101,11 @@ public static function get_me() {
 			? $body['description']
 			: __(
 				'Could not retrieve Telegram bot information.',
-				'telegram-live-chat'
+				'tlc-live-chat-with-telegram'
 			);
 
 		return new WP_Error(
-			'tlc_telegram_get_me_error',
+			'tlcwt_telegram_get_me_error',
 			$error_message,
 			array(
 				'status' => $status_code,
@@ -145,10 +145,10 @@ public static function get_me() {
 
 		if ( empty( $token ) ) {
 			return new WP_Error(
-				'tlc_missing_bot_token',
+				'tlcwt_missing_bot_token',
 				__(
 					'Telegram bot token is not configured.',
-					'telegram-live-chat'
+					'tlc-live-chat-with-telegram'
 				)
 			);
 		}
@@ -161,10 +161,10 @@ public static function get_me() {
 
 		if ( empty( $webhook_secret ) ) {
 			return new WP_Error(
-				'tlc_missing_webhook_secret',
+				'tlcwt_missing_webhook_secret',
 				__(
 					'Webhook secret is not configured.',
-					'telegram-live-chat'
+					'tlc-live-chat-with-telegram'
 				)
 			);
 		}
@@ -180,10 +180,10 @@ public static function get_me() {
 			)
 		) {
 			return new WP_Error(
-				'tlc_invalid_webhook_secret',
+				'tlcwt_invalid_webhook_secret',
 				__(
 					'The webhook secret contains invalid characters.',
-					'telegram-live-chat'
+					'tlc-live-chat-with-telegram'
 				)
 			);
 		}
@@ -192,15 +192,15 @@ public static function get_me() {
 		 * Generate WordPress REST webhook URL.
 		 */
 		$webhook_url = rest_url(
-			'tlc/v1/telegram/webhook'
+			'tlcwt/v1/telegram/webhook'
 		);
 
 		if ( empty( $webhook_url ) ) {
 			return new WP_Error(
-				'tlc_invalid_webhook_url',
+				'tlcwt_invalid_webhook_url',
 				__(
 					'Could not generate the Telegram webhook URL.',
-					'telegram-live-chat'
+					'tlc-live-chat-with-telegram'
 				)
 			);
 		}
@@ -230,7 +230,7 @@ public static function get_me() {
 
 		if ( is_wp_error( $response ) ) {
 			return new WP_Error(
-				'tlc_telegram_connection_error',
+				'tlcwt_telegram_connection_error',
 				$response->get_error_message()
 			);
 		}
@@ -254,11 +254,11 @@ public static function get_me() {
 				? $body['description']
 				: __(
 					'Telegram webhook registration failed.',
-					'telegram-live-chat'
+					'tlc-live-chat-with-telegram'
 				);
 
 			return new WP_Error(
-				'tlc_telegram_webhook_error',
+				'tlcwt_telegram_webhook_error',
 				$error_message,
 				array(
 					'status' => $status_code,
@@ -281,10 +281,10 @@ public static function get_me() {
 
 		if ( empty( $token ) ) {
 			return new WP_Error(
-				'tlc_missing_bot_token',
+				'tlcwt_missing_bot_token',
 				__(
 					'Telegram bot token is not configured.',
-					'telegram-live-chat'
+					'tlc-live-chat-with-telegram'
 				)
 			);
 		}
@@ -302,7 +302,7 @@ public static function get_me() {
 
 		if ( is_wp_error( $response ) ) {
 			return new WP_Error(
-				'tlc_telegram_connection_error',
+				'tlcwt_telegram_connection_error',
 				$response->get_error_message()
 			);
 		}
@@ -326,11 +326,11 @@ public static function get_me() {
 				? $body['description']
 				: __(
 					'Could not retrieve Telegram webhook information.',
-					'telegram-live-chat'
+					'tlc-live-chat-with-telegram'
 				);
 
 			return new WP_Error(
-				'tlc_telegram_webhook_info_error',
+				'tlcwt_telegram_webhook_info_error',
 				$error_message,
 				array(
 					'status' => $status_code,
@@ -350,7 +350,7 @@ public static function get_me() {
 	public static function verify_webhook() {
 
 		$expected_url = rest_url(
-			'tlc/v1/telegram/webhook'
+			'tlcwt/v1/telegram/webhook'
 		);
 
 		$webhook_info = self::get_webhook_info();
@@ -369,10 +369,10 @@ public static function get_me() {
 
 		if ( empty( $actual_url ) ) {
 			return new WP_Error(
-				'tlc_webhook_not_registered',
+				'tlcwt_webhook_not_registered',
 				__(
 					'Telegram webhook is not registered.',
-					'telegram-live-chat'
+					'tlc-live-chat-with-telegram'
 				)
 			);
 		}
@@ -386,10 +386,10 @@ public static function get_me() {
 			untrailingslashit( $expected_url )
 		) {
 			return new WP_Error(
-				'tlc_webhook_url_mismatch',
+				'tlcwt_webhook_url_mismatch',
 				__(
 					'Telegram webhook URL does not match this website.',
-					'telegram-live-chat'
+					'tlc-live-chat-with-telegram'
 				),
 				array(
 					'expected_url' => $expected_url,
@@ -407,12 +407,12 @@ public static function get_me() {
 		) {
 
 			return new WP_Error(
-				'tlc_webhook_last_error',
+				'tlcwt_webhook_last_error',
 				sprintf(
 					/* translators: %s: Telegram error message. */
 					__(
 						'Telegram reported a webhook error: %s',
-						'telegram-live-chat'
+						'tlc-live-chat-with-telegram'
 					),
 					sanitize_text_field(
 						$result['last_error_message']
@@ -449,10 +449,10 @@ public static function get_me() {
 
 		if ( empty( $token ) ) {
 			return new WP_Error(
-				'tlc_missing_bot_token',
+				'tlcwt_missing_bot_token',
 				__(
 					'Telegram bot token is not configured.',
-					'telegram-live-chat'
+					'tlc-live-chat-with-telegram'
 				)
 			);
 		}
@@ -463,10 +463,10 @@ public static function get_me() {
 
 		if ( empty( $chat_id ) ) {
 			return new WP_Error(
-				'tlc_missing_chat_id',
+				'tlcwt_missing_chat_id',
 				__(
 					'Telegram chat ID is missing.',
-					'telegram-live-chat'
+					'tlc-live-chat-with-telegram'
 				)
 			);
 		}
@@ -475,10 +475,10 @@ public static function get_me() {
 
 		if ( '' === trim( $message ) ) {
 			return new WP_Error(
-				'tlc_empty_message',
+				'tlcwt_empty_message',
 				__(
 					'Telegram message cannot be empty.',
-					'telegram-live-chat'
+					'tlc-live-chat-with-telegram'
 				)
 			);
 		}
@@ -503,7 +503,7 @@ public static function get_me() {
 
 		if ( is_wp_error( $response ) ) {
 			return new WP_Error(
-				'tlc_telegram_connection_error',
+				'tlcwt_telegram_connection_error',
 				$response->get_error_message()
 			);
 		}
@@ -529,11 +529,11 @@ public static function get_me() {
 				? $body['description']
 				: __(
 					'Unknown Telegram API error.',
-					'telegram-live-chat'
+					'tlc-live-chat-with-telegram'
 				);
 
 			return new WP_Error(
-				'tlc_telegram_api_error',
+				'tlcwt_telegram_api_error',
 				$telegram_error,
 				array(
 					'status' => $status_code,

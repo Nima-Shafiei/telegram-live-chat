@@ -4,7 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class TLC_Deactivator {
+class TLCWT_Deactivator {
 
 	public static function deactivate() {
 	}

@@ -7,8 +7,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Reserved for backwards compatibility with earlier plugin scaffolding.
  *
- * The plugin bootstrap now lives in TLC_Plugin. Keeping this distinct class
+ * The plugin bootstrap now lives in TLCWT_Plugin. Keeping this distinct class
  * prevents a fatal "class already declared" error if this legacy file is
  * loaded by a host or an integration.
  */
-class TLC_Loader {}
+class TLCWT_Loader {}

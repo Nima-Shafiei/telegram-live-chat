@@ -4,12 +4,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class TLC_Activator {
+class TLCWT_Activator {
 
 	public static function activate() {
 
-		require_once TLC_PATH . 'includes/class-tlc-database.php';
+		require_once TLCWT_PATH . 'includes/class-tlc-database.php';
 
-		TLC_Database::install();
+		TLCWT_Database::install();
 	}
 }

@@ -4,7 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class TLC_REST {
+class TLCWT_REST {
 
 	/**
 	 * Register REST routes.
@@ -43,7 +43,7 @@ private static function is_valid_visitor_id( $visitor_id ) {
 		 * Create visitor message.
 		 */
 		register_rest_route(
-			'tlc/v1',
+			'tlcwt/v1',
 			'/messages',
 			array(
 				'methods'             => WP_REST_Server::CREATABLE,
@@ -55,7 +55,7 @@ private static function is_valid_visitor_id( $visitor_id ) {
  * Get open conversation by visitor ID.
  */
 register_rest_route(
-	'tlc/v1',
+	'tlcwt/v1',
 	'/conversations/by-visitor',
 	array(
 		'methods'             => WP_REST_Server::READABLE,
@@ -73,7 +73,7 @@ register_rest_route(
 		 * Get conversation messages.
 		 */
 		register_rest_route(
-			'tlc/v1',
+			'tlcwt/v1',
 			'/conversations/(?P<conversation_id>[0-9]+)/messages',
 			array(
 				'methods'             => WP_REST_Server::READABLE,
@@ -101,7 +101,7 @@ register_rest_route(
 		 * Telegram webhook.
 		 */
 		register_rest_route(
-			'tlc/v1',
+			'tlcwt/v1',
 			'/telegram/webhook',
 			array(
 				'methods'             => WP_REST_Server::CREATABLE,
@@ -123,7 +123,7 @@ register_rest_route(
 		$params = $request->get_json_params();
 
 		$settings = get_option(
-			'tlc_settings',
+			'tlcwt_settings',
 			array()
 		);
 
@@ -131,8 +131,8 @@ register_rest_route(
 
 		if ( isset( $settings['enabled'] ) && ! $settings['enabled'] ) {
 			return new WP_Error(
-				'tlc_chat_disabled',
-				__( 'Chat is currently unavailable.', 'telegram-live-chat' ),
+				'tlcwt_chat_disabled',
+				__( 'Chat is currently unavailable.', 'tlc-live-chat-with-telegram' ),
 				array( 'status' => 403 )
 			);
 		}
@@ -158,15 +158,15 @@ register_rest_route(
 
 if ( empty( $visitor_id ) ) {
 	return new WP_Error(
-		'tlc_missing_visitor',
-		__( 'Visitor ID is required.', 'telegram-live-chat' ),
+		'tlcwt_missing_visitor',
+		__( 'Visitor ID is required.', 'tlc-live-chat-with-telegram' ),
 		array( 'status' => 400 )
 	);
 }
 if ( ! self::is_valid_visitor_id( $visitor_id ) ) {
 	return new WP_Error(
-		'tlc_invalid_visitor',
-		__( 'Invalid visitor ID.', 'telegram-live-chat' ),
+		'tlcwt_invalid_visitor',
+		__( 'Invalid visitor ID.', 'tlc-live-chat-with-telegram' ),
 		array( 'status' => 400 )
 	);
 }
@@ -184,8 +184,8 @@ if ( is_wp_error( $rate_limit ) ) {
 
 		if ( empty( $message ) ) {
 			return new WP_Error(
-				'tlc_empty_message',
-				__( 'Message cannot be empty.', 'telegram-live-chat' ),
+				'tlcwt_empty_message',
+				__( 'Message cannot be empty.', 'tlc-live-chat-with-telegram' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -196,8 +196,8 @@ if ( is_wp_error( $rate_limit ) ) {
 
 		if ( $message_length > 2000 ) {
 			return new WP_Error(
-				'tlc_message_too_long',
-				__( 'Message is too long.', 'telegram-live-chat' ),
+				'tlcwt_message_too_long',
+				__( 'Message is too long.', 'tlc-live-chat-with-telegram' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -239,22 +239,22 @@ if ( is_wp_error( $rate_limit ) ) {
 			 * conversation if an older host/plugin update did not persist the
 			 * outgoing Telegram message ID.
 			 */
-			$telegram_message  = __( 'New message from website', 'telegram-live-chat' );
+			$telegram_message  = __( 'New message from website', 'tlc-live-chat-with-telegram' );
 			$telegram_message .= sprintf(
 				"\n[%s #%d]\n\n",
-				__( 'Conversation', 'telegram-live-chat' ),
+				__( 'Conversation', 'tlc-live-chat-with-telegram' ),
 				$conversation_id
 			);
 			$telegram_message .= $message;
 
 			if ( ! empty( $page_url ) ) {
-				$telegram_message .= "\n\n" . __( 'Page:', 'telegram-live-chat' ) . "\n" . $page_url;
+				$telegram_message .= "\n\n" . __( 'Page:', 'tlc-live-chat-with-telegram' ) . "\n" . $page_url;
 			}
 
 			$telegram_message_id = 0;
 
 			foreach ( $admin_chat_ids as $admin_chat_id ) {
-				$telegram_result = TLC_Telegram::send_message(
+				$telegram_result = TLCWT_Telegram::send_message(
 					$admin_chat_id,
 					$telegram_message
 				);
@@ -277,7 +277,7 @@ if ( is_wp_error( $rate_limit ) ) {
 
 				global $wpdb;
 
-				$messages_table = TLC_Database::messages_table();
+				$messages_table = TLCWT_Database::messages_table();
 
 				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Updates a row in this plugin's private table.
 				$wpdb->update(
@@ -312,7 +312,7 @@ if ( is_wp_error( $rate_limit ) ) {
 					: 'We received your message and will reply as soon as possible.';
 
 				if ( ! isset( $settings['offline_message'] ) ) {
-					$offline_message = __( 'We received your message and will reply as soon as possible.', 'telegram-live-chat' );
+					$offline_message = __( 'We received your message and will reply as soon as possible.', 'tlc-live-chat-with-telegram' );
 				}
 
 				self::save_message(
@@ -348,15 +348,15 @@ public static function get_conversation_by_visitor( WP_REST_Request $request ) {
 
 	if ( empty( $visitor_id ) ) {
 		return new WP_Error(
-			'tlc_missing_visitor',
-			__( 'Visitor ID is required.', 'telegram-live-chat' ),
+			'tlcwt_missing_visitor',
+			__( 'Visitor ID is required.', 'tlc-live-chat-with-telegram' ),
 			array( 'status' => 400 )
 		);
 	}
 	if ( ! self::is_valid_visitor_id( $visitor_id ) ) {
 	return new WP_Error(
-		'tlc_invalid_visitor',
-		__( 'Invalid visitor ID.', 'telegram-live-chat' ),
+		'tlcwt_invalid_visitor',
+		__( 'Invalid visitor ID.', 'tlc-live-chat-with-telegram' ),
 		array( 'status' => 400 )
 	);
 }
@@ -371,7 +371,7 @@ if ( is_wp_error( $rate_limit ) ) {
 	return $rate_limit;
 }
 
-	$table = TLC_Database::conversations_table();
+	$table = TLCWT_Database::conversations_table();
 
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Live chat data must be read directly from this plugin's private table.
 	$conversation = $wpdb->get_row(
@@ -449,15 +449,15 @@ if ( is_wp_error( $rate_limit ) ) {
 
 		if ( ! $conversation_id || empty( $visitor_id ) ) {
 			return new WP_Error(
-				'tlc_invalid_request',
-				__( 'Invalid conversation request.', 'telegram-live-chat' ),
+				'tlcwt_invalid_request',
+				__( 'Invalid conversation request.', 'tlc-live-chat-with-telegram' ),
 				array( 'status' => 400 )
 			);
 		}
 		if ( ! self::is_valid_visitor_id( $visitor_id ) ) {
 	return new WP_Error(
-		'tlc_invalid_visitor',
-		__( 'Invalid visitor ID.', 'telegram-live-chat' ),
+		'tlcwt_invalid_visitor',
+		__( 'Invalid visitor ID.', 'tlc-live-chat-with-telegram' ),
 		array( 'status' => 400 )
 	);
 }
@@ -472,8 +472,8 @@ if ( is_wp_error( $rate_limit ) ) {
 	return $rate_limit;
 }
 
-		$conversations_table = TLC_Database::conversations_table();
-		$messages_table      = TLC_Database::messages_table();
+		$conversations_table = TLCWT_Database::conversations_table();
+		$messages_table      = TLCWT_Database::messages_table();
 
 		/**
 		 * Verify conversation ownership.
@@ -494,8 +494,8 @@ if ( is_wp_error( $rate_limit ) ) {
 
 		if ( ! $conversation_exists ) {
 			return new WP_Error(
-				'tlc_conversation_not_found',
-				__( 'Conversation not found.', 'telegram-live-chat' ),
+				'tlcwt_conversation_not_found',
+				__( 'Conversation not found.', 'tlc-live-chat-with-telegram' ),
 				array( 'status' => 404 )
 			);
 		}
@@ -564,13 +564,13 @@ private static function check_rate_limit(
 		: 'unknown';
 
 	$key_parts = array(
-		'tlc_rate',
+		'tlcwt_rate',
 		$action,
 		$ip,
 		$visitor_id,
 	);
 
-	$key = 'tlc_' . md5( implode( '|', $key_parts ) );
+	$key = 'tlcwt_' . md5( implode( '|', $key_parts ) );
 
 	$count = get_transient( $key );
 
@@ -596,10 +596,10 @@ private static function check_rate_limit(
 		);
 
 		return new WP_Error(
-			'tlc_rate_limit',
+			'tlcwt_rate_limit',
 			__(
 				'Too many requests. Please try again later.',
-				'telegram-live-chat'
+				'tlc-live-chat-with-telegram'
 			),
 			array(
 				'status'      => 429,
@@ -631,7 +631,7 @@ private static function check_rate_limit(
 
 		global $wpdb;
 
-		$table = TLC_Database::conversations_table();
+		$table = TLCWT_Database::conversations_table();
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Reads the current open conversation from this plugin's private table.
 		$conversation_id = $wpdb->get_var(
@@ -694,8 +694,8 @@ private static function check_rate_limit(
 
 		if ( false === $inserted ) {
 			return new WP_Error(
-				'tlc_conversation_error',
-				__( 'Could not create conversation.', 'telegram-live-chat' ),
+				'tlcwt_conversation_error',
+				__( 'Could not create conversation.', 'tlc-live-chat-with-telegram' ),
 				array( 'status' => 500 )
 			);
 		}
@@ -721,7 +721,7 @@ private static function check_rate_limit(
 
 		global $wpdb;
 
-		$table = TLC_Database::messages_table();
+		$table = TLCWT_Database::messages_table();
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Inserts a message into this plugin's private table.
 		$inserted = $wpdb->insert(
@@ -744,8 +744,8 @@ private static function check_rate_limit(
 
 		if ( false === $inserted ) {
 			return new WP_Error(
-				'tlc_message_error',
-				__( 'Could not save message.', 'telegram-live-chat' ),
+				'tlcwt_message_error',
+				__( 'Could not save message.', 'tlc-live-chat-with-telegram' ),
 				array( 'status' => 500 )
 			);
 		}
@@ -765,7 +765,7 @@ private static function check_rate_limit(
 
 		global $wpdb;
 
-		$table = TLC_Database::messages_table();
+		$table = TLCWT_Database::messages_table();
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Checks transient chat state in this plugin's private table.
 		$count = $wpdb->get_var(
@@ -832,7 +832,7 @@ public static function telegram_webhook( WP_REST_Request $request ) {
 	 * Get plugin settings.
 	 */
 	$settings = get_option(
-		'tlc_settings',
+		'tlcwt_settings',
 		array()
 	);
 
@@ -926,7 +926,7 @@ if (
 		 * Pair administrator using the temporary token.
 		 */
 		$settings = get_option(
-			'tlc_settings',
+			'tlcwt_settings',
 			array()
 		);
 
@@ -1012,7 +1012,7 @@ if (
 		);
 
 		update_option(
-			'tlc_settings',
+			'tlcwt_settings',
 			$settings
 		);
 
@@ -1152,7 +1152,7 @@ if (
 	 */
 	global $wpdb;
 
-	$messages_table = TLC_Database::messages_table();
+	$messages_table = TLCWT_Database::messages_table();
 
 	/* Telegram retries webhooks until it receives a 2xx response. Avoid
 	 * writing the same administrator reply more than once on such retries. */
@@ -1196,7 +1196,7 @@ if (
 
 		if ( preg_match( '/\[[^\]\r\n]*#(\d+)\]/u', $reply_text, $matches ) ) {
 			$candidate_conversation_id = absint( $matches[1] );
-			$conversations_table       = TLC_Database::conversations_table();
+			$conversations_table       = TLCWT_Database::conversations_table();
 
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Verifies a conversation in this plugin's private table.
 			$conversation_id = $wpdb->get_var(
@@ -1256,7 +1256,7 @@ if (
 	/**
 	 * Update conversation timestamp.
 	 */
-	$conversations_table = TLC_Database::conversations_table();
+	$conversations_table = TLCWT_Database::conversations_table();
 
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Updates a conversation in this plugin's private table.
 	$wpdb->update(

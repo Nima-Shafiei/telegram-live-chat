@@ -1,10 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const toggle = document.getElementById('tlc-chat-toggle');
-    const close = document.getElementById('tlc-chat-close');
-    const windowElement = document.getElementById('tlc-chat-window');
-    const form = document.getElementById('tlc-chat-form');
-    const input = document.getElementById('tlc-chat-input');
-    const messages = document.getElementById('tlc-chat-messages');
+    const toggle = document.getElementById('tlcwt-chat-toggle');
+    const close = document.getElementById('tlcwt-chat-close');
+    const windowElement = document.getElementById('tlcwt-chat-window');
+    const form = document.getElementById('tlcwt-chat-form');
+    const input = document.getElementById('tlcwt-chat-input');
+    const messages = document.getElementById('tlcwt-chat-messages');
     const pollInterval = 5000;
 
     let conversationId = null;
@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('TLC send message error:', error);
             optimisticMessage.remove();
             addMessage(
-                TLC_DATA.errorMessage ||
+                TLCWT_DATA.errorMessage ||
                     'Message could not be sent. Please try again.',
                 'system',
             );
@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function getVisitorId() {
-        const storageKey = 'tlc_visitor_id';
+        const storageKey = 'tlcwt_visitor_id';
         let id = localStorage.getItem(storageKey);
 
         if (!id) {
@@ -119,9 +119,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateAdminStatus() {
-        const status = TLC_DATA.status || 'offline';
-        const statusText = document.getElementById('tlc-chat-status-text');
-        const statusElement = document.getElementById('tlc-chat-status');
+        const status = TLCWT_DATA.status || 'offline';
+        const statusText = document.getElementById('tlcwt-chat-status-text');
+        const statusElement = document.getElementById('tlcwt-chat-status');
 
         if (!statusText || !statusElement) {
             return;
@@ -129,16 +129,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const online = status === 'online';
         statusText.textContent = online ? 'Online' : 'Offline';
-        statusElement.classList.toggle('tlc-status-online', online);
-        statusElement.classList.toggle('tlc-status-offline', !online);
+        statusElement.classList.toggle('tlcwt-status-online', online);
+        statusElement.classList.toggle('tlcwt-status-offline', !online);
     }
 
     async function sendMessage(message) {
-        const response = await fetch(`${TLC_DATA.restUrl}messages`, {
+        const response = await fetch(`${TLCWT_DATA.restUrl}messages`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-WP-Nonce': TLC_DATA.nonce,
+                'X-WP-Nonce': TLCWT_DATA.nonce,
             },
             body: JSON.stringify({
                 visitor_id: visitorId,
@@ -231,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function buildRestUrl(endpoint, parameters = {}) {
         const url = new URL(
-            `${TLC_DATA.restUrl}${endpoint}`,
+            `${TLCWT_DATA.restUrl}${endpoint}`,
             window.location.origin,
         );
 
@@ -333,7 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function addMessage(message, sender) {
         const element = document.createElement('div');
-        element.className = `tlc-message tlc-message-${sender}`;
+        element.className = `tlcwt-message tlcwt-message-${sender}`;
         element.textContent = message;
         messages.appendChild(element);
         messages.scrollTop = messages.scrollHeight;

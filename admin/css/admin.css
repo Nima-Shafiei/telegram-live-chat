@@ -1,30 +1,39 @@
-.tlc-admin-page {
+.tlcwt-admin-page {
     max-width: 900px;
 }
 
-.tlc-admin-title {
+.tlcwt-admin-title {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-.tlc-admin-title img {
+.tlcwt-admin-title img {
     width: 26px;
     height: 26px;
 }
 
-.tlc-pairing-form {
+.tlcwt-pairing-form {
     display: inline-block;
 }
 
-.tlc-pairing-form .submit {
+.tlcwt-pairing-form .submit {
     margin: 0;
 }
 
-.tlc-telegram-button {
+.tlcwt-telegram-button {
     display: inline-flex !important;
     align-items: center;
     gap: 6px;
     background: #2aabee !important;
     border-color: #229ed9 !important;
 }
+
+.tlcwt-appearance-layout { display: block; max-width: 900px; }
+.tlcwt-appearance-controls { display: grid; grid-template-columns: repeat(2, minmax(150px, 1fr)); gap: 14px 18px; }
+.tlcwt-appearance-controls label { display: block; font-weight: 600; }
+.tlcwt-appearance-controls input[type="number"], .tlcwt-appearance-controls input[type="text"], .tlcwt-appearance-controls select { margin-top: 5px; width: 100%; max-width: 260px; }
+.tlcwt-icon-picker { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; grid-column: 1 / -1; }
+.tlcwt-icon-picker > span { width: 100%; font-weight: 600; }
+.tlcwt-icon-picker .tlcwt-icon-preview { width: 42px; height: 42px; object-fit: contain; border: 1px solid #dcdcde; border-radius: 8px; background: #fff; }
+@media (max-width: 600px) { .tlcwt-appearance-controls { grid-template-columns: 1fr; } .tlcwt-icon-picker { grid-column: auto; } }
