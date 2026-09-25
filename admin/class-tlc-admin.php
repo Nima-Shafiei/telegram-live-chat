@@ -715,6 +715,8 @@ public static function remove_administrator() {
 			'mobile_height' => 420,
 			'desktop_bottom' => 24,
 			'mobile_bottom' => 60,
+			'desktop_horizontal' => 24,
+			'mobile_horizontal' => 24,
 			'header_text' => __( 'Support', 'tlc-live-chat-with-telegram' ),
 			'header_direction' => 'auto',
 			'icon_id' => 0,
@@ -730,7 +732,7 @@ public static function remove_administrator() {
 			$panel_color = isset( $a['panel_color'] ) && is_string( $a['panel_color'] ) ? sanitize_hex_color( $a['panel_color'] ) : false;
 			$output['appearance']['primary_color'] = $primary_color ? $primary_color : '#2aabee';
 			$output['appearance']['panel_color'] = $panel_color ? $panel_color : '#ffffff';
-			foreach ( array( 'desktop_width' => array( 280, 600, 340 ), 'desktop_height' => array( 320, 800, 480 ), 'mobile_width' => array( 260, 600, 340 ), 'mobile_height' => array( 300, 800, 420 ), 'desktop_bottom' => array( 0, 500, 24 ), 'mobile_bottom' => array( 0, 500, 60 ) ) as $key => $limits ) {
+			foreach ( array( 'desktop_width' => array( 280, 600, 340 ), 'desktop_height' => array( 320, 800, 480 ), 'mobile_width' => array( 260, 600, 340 ), 'mobile_height' => array( 300, 800, 420 ), 'desktop_bottom' => array( 0, 500, 24 ), 'mobile_bottom' => array( 0, 500, 60 ), 'desktop_horizontal' => array( 0, 500, 24 ), 'mobile_horizontal' => array( 0, 500, 24 ) ) as $key => $limits ) {
 				$value = isset( $a[ $key ] ) && is_scalar( $a[ $key ] ) ? absint( $a[ $key ] ) : $limits[2];
 				$output['appearance'][ $key ] = min( $limits[1], max( $limits[0], $value ) );
 			}
@@ -1085,7 +1087,7 @@ TLCWT_Cleanup::reschedule();
 	public static function render_appearance_field() {
 		$settings = get_option( 'tlcwt_settings', array() );
 		$a = isset( $settings['appearance'] ) && is_array( $settings['appearance'] ) ? $settings['appearance'] : array();
-		$defaults = array( 'widget_position' => 'right', 'primary_color' => '#2aabee', 'panel_color' => '#ffffff', 'desktop_width' => 340, 'desktop_height' => 480, 'mobile_width' => 340, 'mobile_height' => 420, 'desktop_bottom' => 24, 'mobile_bottom' => 60, 'header_text' => __( 'Support', 'tlc-live-chat-with-telegram' ), 'header_direction' => 'auto', 'icon_id' => 0 );
+		$defaults = array( 'widget_position' => 'right', 'primary_color' => '#2aabee', 'panel_color' => '#ffffff', 'desktop_width' => 340, 'desktop_height' => 480, 'mobile_width' => 340, 'mobile_height' => 420, 'desktop_bottom' => 24, 'mobile_bottom' => 60, 'desktop_horizontal' => 24, 'mobile_horizontal' => 24, 'header_text' => __( 'Support', 'tlc-live-chat-with-telegram' ), 'header_direction' => 'auto', 'icon_id' => 0 );
 		$a = array_merge( $defaults, $a );
 		$icon_url = ! empty( $a['icon_id'] ) ? wp_get_attachment_image_url( absint( $a['icon_id'] ), 'thumbnail' ) : '';
 		$icon_url = $icon_url ? $icon_url : TLCWT_URL . 'assets/telegram-icon.svg';
@@ -1098,8 +1100,8 @@ TLCWT_Cleanup::reschedule();
 				<label><?php esc_html_e( 'Chat background', 'tlc-live-chat-with-telegram' ); ?><br><input class="tlcwt-color" type="text" name="<?php echo esc_attr( $prefix ); ?>[panel_color]" value="<?php echo esc_attr( $a['panel_color'] ); ?>"></label>
 				<label><?php esc_html_e( 'Header title', 'tlc-live-chat-with-telegram' ); ?><br><input type="text" class="regular-text" name="<?php echo esc_attr( $prefix ); ?>[header_text]" value="<?php echo esc_attr( $a['header_text'] ); ?>"></label>
 				<label><?php esc_html_e( 'Title direction', 'tlc-live-chat-with-telegram' ); ?><br><select name="<?php echo esc_attr( $prefix ); ?>[header_direction]"><option value="auto" <?php selected( $a['header_direction'], 'auto' ); ?>><?php esc_html_e( 'Automatic', 'tlc-live-chat-with-telegram' ); ?></option><option value="rtl" <?php selected( $a['header_direction'], 'rtl' ); ?>>RTL</option><option value="ltr" <?php selected( $a['header_direction'], 'ltr' ); ?>>LTR</option></select></label>
-				<?php foreach ( array( 'desktop_width' => __( 'Desktop width (px)', 'tlc-live-chat-with-telegram' ), 'desktop_height' => __( 'Desktop height (px)', 'tlc-live-chat-with-telegram' ), 'mobile_width' => __( 'Mobile width (px)', 'tlc-live-chat-with-telegram' ), 'mobile_height' => __( 'Mobile height (px)', 'tlc-live-chat-with-telegram' ), 'desktop_bottom' => __( 'Desktop distance from bottom (px)', 'tlc-live-chat-with-telegram' ), 'mobile_bottom' => __( 'Mobile distance from bottom (px)', 'tlc-live-chat-with-telegram' ) ) as $key => $label ) : ?>
-				<label><?php echo esc_html( $label ); ?><br><input type="number" min="<?php echo false !== strpos( $key, 'bottom' ) ? '0' : '260'; ?>" max="<?php echo false !== strpos( $key, 'bottom' ) ? '500' : '800'; ?>" step="1" name="<?php echo esc_attr( $prefix . '[' . $key . ']' ); ?>" value="<?php echo esc_attr( $a[ $key ] ); ?>"></label>
+				<?php foreach ( array( 'desktop_width' => __( 'Desktop width (px)', 'tlc-live-chat-with-telegram' ), 'desktop_height' => __( 'Desktop height (px)', 'tlc-live-chat-with-telegram' ), 'mobile_width' => __( 'Mobile width (px)', 'tlc-live-chat-with-telegram' ), 'mobile_height' => __( 'Mobile height (px)', 'tlc-live-chat-with-telegram' ), 'desktop_bottom' => __( 'Desktop distance from bottom (px)', 'tlc-live-chat-with-telegram' ), 'mobile_bottom' => __( 'Mobile distance from bottom (px)', 'tlc-live-chat-with-telegram' ), 'desktop_horizontal' => __( 'Desktop horizontal offset (px)', 'tlc-live-chat-with-telegram' ), 'mobile_horizontal' => __( 'Mobile horizontal offset (px)', 'tlc-live-chat-with-telegram' ) ) as $key => $label ) : ?>
+				<label><?php echo esc_html( $label ); ?><br><input type="number" min="<?php echo false !== strpos( $key, 'bottom' ) || false !== strpos( $key, 'horizontal' ) ? '0' : '260'; ?>" max="<?php echo false !== strpos( $key, 'bottom' ) || false !== strpos( $key, 'horizontal' ) ? '500' : '800'; ?>" step="1" name="<?php echo esc_attr( $prefix . '[' . $key . ']' ); ?>" value="<?php echo esc_attr( $a[ $key ] ); ?>"></label>
 				<?php endforeach; ?>
 				<div class="tlcwt-icon-picker"><span><?php esc_html_e( 'Chat icon', 'tlc-live-chat-with-telegram' ); ?></span><input type="hidden" name="<?php echo esc_attr( $prefix ); ?>[icon_id]" value="<?php echo esc_attr( absint( $a['icon_id'] ) ); ?>"><img class="tlcwt-icon-preview" src="<?php echo esc_url( $icon_url ); ?>" alt=""><button type="button" class="button" id="tlcwt-select-icon"><?php esc_html_e( 'Choose image', 'tlc-live-chat-with-telegram' ); ?></button><button type="button" class="button-link-delete" id="tlcwt-remove-icon" data-default-icon="<?php echo esc_url( TLCWT_URL . 'assets/telegram-icon.svg' ); ?>" <?php disabled( empty( $a['icon_id'] ) ); ?>><?php esc_html_e( 'Use default', 'tlc-live-chat-with-telegram' ); ?></button></div>
 			</div>

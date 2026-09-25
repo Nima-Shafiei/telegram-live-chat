@@ -1,6 +1,6 @@
 #tlcwt-chat-widget {
     position: fixed;
-    right: 24px;
+    right: var(--tlcwt-desktop-horizontal, 24px);
     bottom: var(--tlcwt-desktop-bottom, 24px);
     z-index: 999999;
     font-family: inherit;
@@ -215,13 +215,13 @@
     }
 }
 
-#tlcwt-chat-widget.tlcwt-position-left { left: 24px; right: auto; }
+#tlcwt-chat-widget.tlcwt-position-left { left: var(--tlcwt-desktop-horizontal, 24px); right: auto; }
 #tlcwt-chat-widget.tlcwt-position-right #tlcwt-chat-window { left: auto; right: 0; }
 #tlcwt-chat-widget.tlcwt-position-left #tlcwt-chat-window { left: 0; right: auto; }
 
 @media (max-width: 480px) {
     #tlcwt-chat-widget {
-        right: 15px;
+        right: var(--tlcwt-mobile-horizontal, 15px);
         bottom: var(--tlcwt-mobile-bottom, 60px);
     }
 
@@ -235,10 +235,10 @@
         max-height: none;
     }
 
-	#tlcwt-chat-widget.tlcwt-position-left { left: 15px; right: auto; }
-	#tlcwt-chat-widget.tlcwt-position-right { right: 15px; left: auto; }
-	#tlcwt-chat-widget.tlcwt-position-right #tlcwt-chat-window { left: auto; right: 15px; }
-	#tlcwt-chat-widget.tlcwt-position-left #tlcwt-chat-window { left: 15px; right: auto; }
+    #tlcwt-chat-widget.tlcwt-position-left { left: var(--tlcwt-mobile-horizontal, 15px); right: auto; }
+    #tlcwt-chat-widget.tlcwt-position-right { right: var(--tlcwt-mobile-horizontal, 15px); left: auto; }
+    #tlcwt-chat-widget.tlcwt-position-right #tlcwt-chat-window { left: auto; right: var(--tlcwt-mobile-horizontal, 15px); }
+    #tlcwt-chat-widget.tlcwt-position-left #tlcwt-chat-window { left: var(--tlcwt-mobile-horizontal, 15px); right: auto; }
 }
 
 .tlcwt-status-offline .tlcwt-status-dot {

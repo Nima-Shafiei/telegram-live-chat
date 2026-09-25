@@ -84,7 +84,7 @@ class TLCWT_Public {
 			$value = isset( $appearance[ $key ] ) ? absint( $appearance[ $key ] ) : $default;
 			return min( $max, max( $min, $value ) );
 		};
-		$style = sprintf( '--tlcwt-primary:%1$s;--tlcwt-panel:%2$s;--tlcwt-desktop-width:%3$dpx;--tlcwt-desktop-height:%4$dpx;--tlcwt-mobile-width:%5$dpx;--tlcwt-mobile-height:%6$dpx;--tlcwt-desktop-bottom:%7$dpx;--tlcwt-mobile-bottom:%8$dpx;', esc_attr( $primary ), esc_attr( $panel ), $number( 'desktop_width', 340, 280, 600 ), $number( 'desktop_height', 480, 320, 800 ), $number( 'mobile_width', 340, 260, 600 ), $number( 'mobile_height', 420, 300, 800 ), $number( 'desktop_bottom', 24, 0, 500 ), $number( 'mobile_bottom', 60, 0, 500 ) );
+		$style = sprintf( '--tlcwt-primary:%1$s;--tlcwt-panel:%2$s;--tlcwt-desktop-width:%3$dpx;--tlcwt-desktop-height:%4$dpx;--tlcwt-mobile-width:%5$dpx;--tlcwt-mobile-height:%6$dpx;--tlcwt-desktop-bottom:%7$dpx;--tlcwt-mobile-bottom:%8$dpx;--tlcwt-desktop-horizontal:%9$dpx;--tlcwt-mobile-horizontal:%10$dpx;', esc_attr( $primary ), esc_attr( $panel ), $number( 'desktop_width', 340, 280, 600 ), $number( 'desktop_height', 480, 320, 800 ), $number( 'mobile_width', 340, 260, 600 ), $number( 'mobile_height', 420, 300, 800 ), $number( 'desktop_bottom', 24, 0, 500 ), $number( 'mobile_bottom', 60, 0, 500 ), $number( 'desktop_horizontal', 24, 0, 500 ), $number( 'mobile_horizontal', 24, 0, 500 ) );
 		$icon_url = ! empty( $appearance['icon_id'] ) ? wp_get_attachment_image_url( absint( $appearance['icon_id'] ), 'thumbnail' ) : '';
 		$icon_url = $icon_url ? $icon_url : TLCWT_URL . 'assets/telegram-icon.svg';
 		$title = isset( $appearance['header_text'] ) ? $appearance['header_text'] : __( 'Support', 'tlc-live-chat-with-telegram' );
